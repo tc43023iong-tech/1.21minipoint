@@ -1,0 +1,5 @@
+{
+  "name": "1.21Miss Iong's Class Point System",
+  "description": "A Pokemon-themed student reward and management system featuring point tracking, random selection, and data persistence.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miss Iong's Class</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Quicksand', sans-serif;
+            overflow-x: hidden;
+            background: #fff5f8;
+        }
+
+        /* Firework Animation */
+        .firework {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          box-shadow: 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff;
+          animation: fireworks 2s infinite;
+          pointer-events: none;
+          z-index: -1;
+        }
+
+        @keyframes fireworks {
+          0% { box-shadow: 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff; }
+          100% { box-shadow: -100px -100px 0 2px #ff6b6b, 100px -100px 0 2px #4ecdc4, 100px 100px 0 2px #ffe66d, -100px 100px 0 2px #ff9ff3, 0 -150px 0 2px #a29bfe, 0 150px 0 2px #55efc4; opacity: 0; }
+        }
+
+        .candy-gradient {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+
+        .scroll-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scroll-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+</head>
+<body class="bg-pink-50 min-h-screen">
+    <div id="root"></div>
+    <!-- Simple Firework Elements -->
+    <div class="firework" style="left: 20%; top: 30%; animation-delay: 0s;"></div>
+    <div class="firework" style="left: 80%; top: 20%; animation-delay: 0.5s;"></div>
+    <div class="firework" style="left: 50%; top: 70%; animation-delay: 1.2s;"></div>
+    <div class="firework" style="left: 10%; top: 80%; animation-delay: 1.8s;"></div>
+    <div class="firework" style="left: 90%; top: 60%; animation-delay: 2.2s;"></div>
+
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
