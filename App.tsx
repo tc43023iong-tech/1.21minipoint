@@ -61,7 +61,6 @@ const App: React.FC = () => {
   const applyPoints = (targets: Student[], amount: number, reason: string) => {
     const isPositive = amount > 0;
     
-    // Prepare result data for the overlay (showing updated totals)
     const resultDetails = targets.map(s => ({
       id: s.id,
       name: s.name,
@@ -93,10 +92,8 @@ const App: React.FC = () => {
     if (isPositive) audioService.playPlus();
     else audioService.playMinus();
 
-    // Auto-close result after delay
     setTimeout(() => setScoreResult(null), 1500);
     
-    // Reset selection state
     setSelectedStudents([]);
     setShowScoreModal(false);
     setManualInput('');
@@ -174,7 +171,6 @@ const App: React.FC = () => {
         </div>
         
         <div className="flex flex-wrap gap-2 mt-4 md:mt-0 items-center justify-center">
-          {/* Class Selector Dropdown */}
           <div className="relative group mr-2">
             <select 
               value={selectedClassId}
@@ -206,9 +202,8 @@ const App: React.FC = () => {
       </div>
 
       <div className="space-y-4">
-        {/* Control Bar (Sorting and Command Buttons) */}
+        {/* Control Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 bg-white/80 p-4 rounded-2xl border-2 border-pink-100 shadow-sm">
-          {/* Sorting Group */}
           <div className="flex flex-wrap gap-2">
             <button 
               onClick={() => setSortType(SortType.ID)}
@@ -230,9 +225,7 @@ const App: React.FC = () => {
             </button>
           </div>
           
-          {/* Action Group */}
           <div className="flex flex-wrap items-center gap-2">
-            {/* Selection Controls */}
             <div className="flex items-center gap-1 bg-purple-50 p-1 rounded-full border border-purple-100">
               <button 
                 onClick={() => setSelectedStudents(currentClass.students.map(s => s.id))}
@@ -248,7 +241,6 @@ const App: React.FC = () => {
               </button>
             </div>
 
-            {/* Random Controls */}
             <div className="flex items-center gap-1 bg-red-50 p-1 rounded-full border border-red-100">
               <button 
                 onClick={handleRandomPick}
@@ -265,7 +257,6 @@ const App: React.FC = () => {
               </button>
             </div>
 
-            {/* Award Points Button */}
             <button 
               disabled={selectedStudents.length === 0}
               onClick={() => setShowScoreModal(true)}
@@ -278,7 +269,6 @@ const App: React.FC = () => {
               獎懲評分 ({selectedStudents.length})
             </button>
 
-            {/* Rules Button */}
             <button 
               onClick={() => setShowRules(true)}
               className="w-9 h-9 flex items-center justify-center bg-yellow-400 text-white rounded-full text-lg shadow-md hover:scale-110 transition"
@@ -294,7 +284,6 @@ const App: React.FC = () => {
             <div 
               key={student.id}
               onClick={() => {
-                // Instant Award Points for individual click
                 setSelectedStudents([student.id]);
                 setShowScoreModal(true);
               }}
@@ -372,101 +361,101 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Score Apply Modal */}
+      {/* Score Apply Modal - Simplified as requested */}
       {showScoreModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl border-8 border-pink-300">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold text-pink-600">AWARD POINTS / 獎懲評分</h2>
-              <button onClick={() => setShowScoreModal(false)} className="text-3xl font-bold text-gray-400 hover:text-red-500">&times;</button>
-            </div>
+          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl border-8 border-pink-300 relative">
+            <button onClick={() => setShowScoreModal(false)} className="absolute top-6 right-6 text-4xl font-bold text-gray-300 hover:text-red-500 transition-colors z-10">&times;</button>
 
-            {/* Selected Students List Display */}
-            <div className="mb-6 p-4 bg-pink-50 rounded-2xl border-2 border-dashed border-pink-200">
-              <h3 className="text-sm font-bold text-pink-400 uppercase tracking-widest mb-2">Selected Students / 已選擇學生 ({currentlySelectedStudents.length}):</h3>
-              <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto scroll-hide">
+            {/* Prominent Student Display */}
+            <div className="mb-8 text-center">
+              <div className="flex flex-wrap justify-center gap-4 mb-4">
                 {currentlySelectedStudents.map(s => (
-                  <div key={s.id} className="px-3 py-1 bg-white border-2 border-pink-100 rounded-full flex items-center gap-2 shadow-sm">
-                    <img 
-                      src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${s.pokemonId}.png`} 
-                      className="w-5 h-5 object-contain"
-                    />
-                    <span className="text-sm font-bold text-gray-700">#{s.id} {s.name} (現時: {s.points})</span>
+                  <div key={s.id} className="flex flex-col items-center">
+                    <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center p-2 mb-2 border-2 border-pink-100 shadow-sm relative overflow-hidden">
+                      <img 
+                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${s.pokemonId}.png`} 
+                        className="w-full h-full object-contain relative z-10"
+                      />
+                    </div>
+                    <span className="text-2xl font-black text-pink-600">#{s.id} {s.name}</span>
+                    <span className="text-sm font-bold text-pink-300">當前分數: {s.points}</span>
                   </div>
                 ))}
               </div>
             </div>
             
-            <div className="mb-8">
-              <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">Manual Input / 手動輸入:</label>
+            <div className="mb-10 max-w-lg mx-auto">
               <div className="flex gap-2">
                 <input 
                   type="number"
-                  placeholder="Points / 分數"
+                  placeholder="輸入自定義分數 / Manual points..."
                   value={manualInput}
                   onChange={(e) => setManualInput(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && manualInput) {
                       const amount = parseInt(manualInput);
-                      applyPoints(currentlySelectedStudents, amount, 'Manual Entry / 手動輸入');
+                      applyPoints(currentlySelectedStudents, amount, '手動輸入');
                     }
                   }}
-                  className="flex-1 px-4 py-3 bg-gray-100 rounded-xl border-2 border-transparent focus:border-pink-400 outline-none font-bold text-xl"
+                  className="flex-1 px-6 py-4 bg-pink-50 rounded-2xl border-4 border-pink-100 focus:border-pink-300 outline-none font-black text-2xl text-pink-600 text-center placeholder:text-pink-200"
                 />
                 <button 
                   onClick={() => {
                     if (manualInput) {
                       const amount = parseInt(manualInput);
-                      applyPoints(currentlySelectedStudents, amount, 'Manual Entry / 手動輸入');
+                      applyPoints(currentlySelectedStudents, amount, '手動輸入');
                     }
                   }}
-                  className="px-8 bg-pink-500 text-white rounded-xl font-bold hover:bg-pink-600 shadow-md transition-all active:scale-95"
+                  className="px-8 bg-pink-500 text-white rounded-2xl font-black text-xl hover:bg-pink-600 shadow-lg transition-all active:scale-95"
                 >
-                  Apply / 應用
+                  OK
                 </button>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-xl font-bold text-green-500 mb-4 flex items-center gap-2">
-                  ⭐ POSITIVE / 加分
-                </h3>
-                <div className="space-y-2">
+                <div className="flex items-center gap-3 mb-4 px-2">
+                  <span className="text-2xl">⭐</span>
+                  <h3 className="text-xl font-black text-green-500 uppercase tracking-widest">Positive / 加分項目</h3>
+                </div>
+                <div className="grid grid-cols-1 gap-3">
                   {POSITIVE_ACTIONS.map(action => (
                     <button
                       key={action.label}
                       onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
-                      className="w-full p-4 bg-green-50 hover:bg-green-100 rounded-2xl text-left border-2 border-green-100 flex items-center gap-3 transition group"
+                      className="w-full p-4 bg-green-50 hover:bg-green-100 rounded-2xl text-left border-2 border-green-100 flex items-center gap-4 transition group active:scale-[0.98]"
                     >
-                      <span className="text-2xl group-hover:scale-125 transition">{action.icon}</span>
+                      <span className="text-3xl group-hover:scale-125 transition inline-block w-10 text-center">{action.icon}</span>
                       <div className="flex-1">
-                        <div className="font-bold text-green-700">{action.label}</div>
-                        <div className="text-xs text-green-400 uppercase">{action.labelEn}</div>
+                        <div className="font-black text-green-700 text-lg leading-tight">{action.label}</div>
+                        <div className="text-[10px] text-green-400 uppercase font-bold">{action.labelEn}</div>
                       </div>
-                      <div className="text-xl font-black text-green-500">+{action.value}</div>
+                      <div className="text-2xl font-black text-green-500 bg-white px-4 py-1 rounded-xl shadow-sm">+{action.value}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-red-500 mb-4 flex items-center gap-2">
-                  ⚠️ NEGATIVE / 減分
-                </h3>
-                <div className="space-y-2">
+                <div className="flex items-center gap-3 mb-4 px-2">
+                  <span className="text-2xl">⚠️</span>
+                  <h3 className="text-xl font-black text-red-500 uppercase tracking-widest">Negative / 減分項目</h3>
+                </div>
+                <div className="grid grid-cols-1 gap-3">
                   {NEGATIVE_ACTIONS.map(action => (
                     <button
                       key={action.label}
                       onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
-                      className="w-full p-4 bg-red-50 hover:bg-red-100 rounded-2xl text-left border-2 border-red-100 flex items-center gap-3 transition group"
+                      className="w-full p-4 bg-red-50 hover:bg-red-100 rounded-2xl text-left border-2 border-red-100 flex items-center gap-4 transition group active:scale-[0.98]"
                     >
-                      <span className="text-2xl group-hover:scale-125 transition">{action.icon}</span>
+                      <span className="text-3xl group-hover:scale-125 transition inline-block w-10 text-center">{action.icon}</span>
                       <div className="flex-1">
-                        <div className="font-bold text-red-700">{action.label}</div>
-                        <div className="text-xs text-red-400 uppercase">{action.labelEn}</div>
+                        <div className="font-black text-red-700 text-lg leading-tight">{action.label}</div>
+                        <div className="text-[10px] text-red-400 uppercase font-bold">{action.labelEn}</div>
                       </div>
-                      <div className="text-xl font-black text-red-500">{action.value}</div>
+                      <div className="text-2xl font-black text-red-500 bg-white px-4 py-1 rounded-xl shadow-sm">{action.value}</div>
                     </button>
                   ))}
                 </div>
@@ -500,11 +489,11 @@ const App: React.FC = () => {
                   <p className="text-3xl font-black text-pink-600">
                     {scoreResult.points > 0 ? '+' : ''}{scoreResult.points} {scoreResult.reason}
                   </p>
-                  <p className="text-lg font-bold text-gray-400">Current Score / 當前分數: <span className="text-pink-500 text-2xl">{scoreResult.students[0].newTotal}</span></p>
+                  <p className="text-lg font-bold text-gray-400">當前分數: <span className="text-pink-500 text-3xl">{scoreResult.students[0].newTotal}</span></p>
                 </>
               ) : (
                 <>
-                  <p className="text-xl font-bold text-gray-700">Multi-Select / 多選 ({scoreResult.students.length} Students)</p>
+                  <p className="text-xl font-bold text-gray-700">多選評分 ({scoreResult.students.length} 位學生)</p>
                   <p className="text-3xl font-black text-pink-600">
                     {scoreResult.points > 0 ? '+' : ''}{scoreResult.points} {scoreResult.reason}
                   </p>
@@ -550,7 +539,7 @@ const App: React.FC = () => {
                   }}
                   className="flex-1 py-4 bg-pink-500 text-white rounded-2xl font-black text-xl hover:bg-pink-600 shadow-lg active:scale-95 transition"
                 >
-                  AWARD POINTS / 評分
+                  評分
                 </button>
                 <button 
                   onClick={() => setShowRandomPicker(false)}
