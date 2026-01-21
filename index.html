@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,21 +17,34 @@
         /* Firework Animation */
         .firework {
           position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 4px;
-          height: 4px;
+          width: 6px;
+          height: 6px;
           border-radius: 50%;
-          box-shadow: 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff;
-          animation: fireworks 2s infinite;
+          box-shadow: 0 0 #fff;
+          animation: fireworks 1.5s infinite;
           pointer-events: none;
-          z-index: -1;
+          z-index: 101;
         }
 
         @keyframes fireworks {
-          0% { box-shadow: 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff; }
-          100% { box-shadow: -100px -100px 0 2px #ff6b6b, 100px -100px 0 2px #4ecdc4, 100px 100px 0 2px #ffe66d, -100px 100px 0 2px #ff9ff3, 0 -150px 0 2px #a29bfe, 0 150px 0 2px #55efc4; opacity: 0; }
+          0% { 
+            transform: translate(-50%, -50%) scale(1);
+            box-shadow: 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff; 
+            opacity: 1;
+          }
+          100% { 
+            transform: translate(-50%, -50%) scale(1.5);
+            box-shadow: 
+              -120px -120px 0 2px #ff6b6b, 
+              120px -120px 0 2px #4ecdc4, 
+              120px 120px 0 2px #ffe66d, 
+              -120px 120px 0 2px #ff9ff3, 
+              0 -180px 0 2px #a29bfe, 
+              0 180px 0 2px #55efc4,
+              -180px 0 0 2px #ff7675,
+              180px 0 0 2px #fdcb6e; 
+            opacity: 0; 
+          }
         }
 
         .candy-gradient {
@@ -59,12 +71,10 @@
 </head>
 <body class="bg-pink-50 min-h-screen">
     <div id="root"></div>
-    <!-- Simple Firework Elements -->
-    <div class="firework" style="left: 20%; top: 30%; animation-delay: 0s;"></div>
-    <div class="firework" style="left: 80%; top: 20%; animation-delay: 0.5s;"></div>
-    <div class="firework" style="left: 50%; top: 70%; animation-delay: 1.2s;"></div>
-    <div class="firework" style="left: 10%; top: 80%; animation-delay: 1.8s;"></div>
-    <div class="firework" style="left: 90%; top: 60%; animation-delay: 2.2s;"></div>
+    <!-- Simple Background Firework Elements -->
+    <div class="firework" style="left: 15%; top: 20%; animation-delay: 0.2s; opacity: 0.3;"></div>
+    <div class="firework" style="left: 85%; top: 15%; animation-delay: 0.7s; opacity: 0.3;"></div>
+    <div class="firework" style="left: 45%; top: 80%; animation-delay: 1.4s; opacity: 0.3;"></div>
 
     <script type="module" src="/index.tsx"></script>
 </body>

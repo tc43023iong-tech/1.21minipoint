@@ -92,7 +92,7 @@ const App: React.FC = () => {
     if (isPositive) audioService.playPlus();
     else audioService.playMinus();
 
-    setTimeout(() => setScoreResult(null), 1500);
+    setTimeout(() => setScoreResult(null), 2000);
     
     setSelectedStudents([]);
     setShowScoreModal(false);
@@ -495,26 +495,43 @@ const App: React.FC = () => {
 
       {/* Result Overlay */}
       {scoreResult && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/20 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white rounded-[3rem] p-10 shadow-2xl border-[12px] border-pink-400 text-center max-w-md w-full m-4">
-            <h2 className="text-4xl font-black mb-2 animate-bounce">
+        <div className={`fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-md animate-in fade-in duration-300 ${scoreResult.isPositive ? 'bg-white/30' : 'bg-pink-100/50'}`}>
+          {/* Active Fireworks for positive result */}
+          {scoreResult.isPositive && (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="firework" style={{ 
+                  left: `${10 + Math.random() * 80}%`, 
+                  top: `${10 + Math.random() * 80}%`, 
+                  animationDelay: `${i * 0.3}s`
+                }}></div>
+              ))}
+            </div>
+          )}
+
+          <div className={`rounded-[3rem] p-10 shadow-2xl border-[12px] text-center max-w-md w-full m-4 relative z-10 transition-colors duration-500
+            ${scoreResult.isPositive 
+              ? 'bg-white border-pink-400' 
+              : 'bg-pink-100 border-pink-300'}`}>
+            
+            <h2 className="text-4xl font-black mb-2 animate-bounce uppercase">
               {scoreResult.isPositive ? 'CONGRATULATIONS!' : 'KEEP WORKING HARD!'}
             </h2>
-            <h3 className="text-2xl font-bold text-pink-500 mb-6">
+            <h3 className={`text-2xl font-bold mb-6 ${scoreResult.isPositive ? 'text-pink-500' : 'text-pink-600'}`}>
               {scoreResult.isPositive ? '恭喜你！' : '繼續努力！'}
             </h3>
             
-            <div className="space-y-4 py-4 border-y-4 border-dotted border-pink-100 my-4">
+            <div className={`space-y-4 py-4 border-y-4 border-dotted my-4 ${scoreResult.isPositive ? 'border-pink-100' : 'border-pink-200'}`}>
               {scoreResult.students.length === 1 ? (
                 <>
                   <p className="text-3xl font-black text-slate-800">#{scoreResult.students[0].id} {scoreResult.students[0].name}</p>
-                  <div className="mx-auto w-40 h-40 bg-pink-50 rounded-full flex items-center justify-center p-4 shadow-inner">
+                  <div className={`mx-auto w-40 h-40 rounded-full flex items-center justify-center p-4 shadow-inner ${scoreResult.isPositive ? 'bg-pink-50' : 'bg-pink-50/50'}`}>
                     <img 
                       src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${scoreResult.students[0].pokemonId}.png`} 
                       className="w-full h-full object-contain"
                     />
                   </div>
-                  <p className="text-4xl font-black text-pink-600">
+                  <p className={`text-4xl font-black ${scoreResult.isPositive ? 'text-pink-600' : 'text-pink-500'}`}>
                     {scoreResult.points > 0 ? '+' : ''}{scoreResult.points} {scoreResult.reason}
                   </p>
                   <div className="bg-yellow-50 text-amber-700 rounded-full px-6 py-2 inline-flex items-center gap-2 font-black shadow-md mt-2">
@@ -525,10 +542,10 @@ const App: React.FC = () => {
               ) : (
                 <>
                   <p className="text-2xl font-bold text-gray-700">多選評分 ({scoreResult.students.length} 位學生)</p>
-                  <p className="text-4xl font-black text-pink-600">
+                  <p className={`text-4xl font-black ${scoreResult.isPositive ? 'text-pink-600' : 'text-pink-500'}`}>
                     {scoreResult.points > 0 ? '+' : ''}{scoreResult.points} {scoreResult.reason}
                   </p>
-                  <p className="text-xl font-bold text-pink-400 mt-4 italic">Scores updated! / 分數已更新</p>
+                  <p className="text-xl font-bold text-pink-400 mt-4 italic uppercase tracking-wider">Scores updated!</p>
                 </>
               )}
             </div>
