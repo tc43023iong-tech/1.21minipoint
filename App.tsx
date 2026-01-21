@@ -58,6 +58,14 @@ const App: React.FC = () => {
     }));
   }, [selectedClassId]);
 
+  const toggleStudentSelection = (studentId: number) => {
+    setSelectedStudents(prev => 
+      prev.includes(studentId) 
+        ? prev.filter(id => id !== studentId) 
+        : [...prev, studentId]
+    );
+  };
+
   const applyPoints = (targets: Student[], amount: number, reason: string) => {
     const isPositive = amount > 0;
     
@@ -279,74 +287,83 @@ const App: React.FC = () => {
         </div>
 
         {/* Student Grid Container */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
-          {sortedStudents.map((student, idx) => (
-            <div 
-              key={student.id}
-              onClick={() => {
-                setSelectedStudents([student.id]);
-                setShowScoreModal(true);
-              }}
-              className={`relative bg-white rounded-[2.5rem] p-5 transition-all cursor-pointer group hover:scale-[1.03] flex flex-col items-center ${
-                selectedStudents.includes(student.id) 
-                ? 'ring-4 ring-pink-400 shadow-pink-200 shadow-xl bg-pink-50' 
-                : 'shadow-xl shadow-pink-100/30'
-              }`}
-            >
-              {/* Ranking Badge */}
-              {(sortType === SortType.SCORE_HI_LO || sortType === SortType.SCORE_LO_HI) && (
-                <div className={`absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center font-black shadow-md border-2 z-10 text-lg
-                  ${idx === 0 ? 'bg-yellow-400 text-white border-yellow-200' : 
-                    idx === 1 ? 'bg-slate-300 text-white border-slate-100' :
-                    idx === 2 ? 'bg-amber-600 text-white border-amber-400' :
-                    'bg-pink-100 text-pink-500 border-white'}`}>
-                  {idx + 1}
-                </div>
-              )}
-
-              {/* Pokemon Image */}
-              <div className="relative w-24 h-24 mb-3 group-hover:scale-110 transition-transform duration-300">
-                <img 
-                  src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${student.pokemonId}.png`}
-                  alt="Pokemon"
-                  className="w-full h-full object-contain pixelated"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowPokemonPicker(student.id);
-                  }}
-                />
-              </div>
-
-              {/* ID, Name and Point Badge Container */}
-              <div className="w-full flex justify-between items-center mb-4 px-1">
-                <div className="text-left flex-1 truncate mr-1">
-                  <div className="text-pink-500 font-black text-base">
-                    #{student.id}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 md:gap-6">
+          {sortedStudents.map((student, idx) => {
+            const isSelected = selectedStudents.includes(student.id);
+            return (
+              <div 
+                key={student.id}
+                onClick={() => toggleStudentSelection(student.id)}
+                className={`relative bg-white rounded-[2.5rem] p-4 transition-all cursor-pointer group hover:scale-[1.03] flex flex-col items-center ${
+                  isSelected 
+                  ? 'ring-4 ring-pink-400 shadow-pink-200 shadow-xl bg-pink-50' 
+                  : 'shadow-xl shadow-pink-100/30'
+                }`}
+              >
+                {/* Tick Icon in Top Right */}
+                {isSelected && (
+                  <div className="absolute -top-2 -right-2 bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-4 border-white z-20 animate-in zoom-in duration-200">
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
                   </div>
-                  <h3 className="text-xl font-black text-[#2c3e50] truncate">
-                    {student.name}
-                  </h3>
+                )}
+
+                {/* Ranking Badge */}
+                {(sortType === SortType.SCORE_HI_LO || sortType === SortType.SCORE_LO_HI) && (
+                  <div className={`absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center font-black shadow-md border-2 z-10 text-base
+                    ${idx === 0 ? 'bg-yellow-400 text-white border-yellow-200' : 
+                      idx === 1 ? 'bg-slate-300 text-white border-slate-100' :
+                      idx === 2 ? 'bg-amber-600 text-white border-amber-400' :
+                      'bg-pink-100 text-pink-500 border-white'}`}>
+                    {idx + 1}
+                  </div>
+                )}
+
+                {/* Pokemon Image */}
+                <div className="relative w-20 h-20 mb-2 group-hover:scale-110 transition-transform duration-300">
+                  <img 
+                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${student.pokemonId}.png`}
+                    alt="Pokemon"
+                    className="w-full h-full object-contain pixelated"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowPokemonPicker(student.id);
+                    }}
+                  />
                 </div>
 
-                <div className="bg-[#fff9db] text-[#916912] rounded-2xl px-2.5 py-1 flex flex-col items-center gap-0 font-black shadow-sm border border-[#fff3bf] shrink-0">
-                  <span className="text-[#bf9106] text-[10px]">★</span>
-                  <span className="text-xl leading-none">{student.points}</span>
-                </div>
-              </div>
+                {/* ID, Name and Point Badge Container */}
+                <div className="w-full flex justify-between items-center mb-4 px-1">
+                  <div className="text-left flex-1 truncate mr-1">
+                    <div className="text-pink-500 font-black text-xs md:text-sm">
+                      #{student.id}
+                    </div>
+                    <h3 className="text-lg font-black text-[#2c3e50] truncate">
+                      {student.name}
+                    </h3>
+                  </div>
 
-              {/* Stats Footer */}
-              <div className="w-full grid grid-cols-2 gap-1.5 mt-auto">
-                <div className="bg-[#ebfaf2] border border-[#c3f2d7] rounded-xl p-1.5 flex flex-col items-center justify-center shadow-sm">
-                  <div className="text-[#2ecc71] font-bold text-[9px] leading-tight">POS / 加分</div>
-                  <div className="text-[#2ecc71] font-black text-base leading-tight">+{student.plusPoints}</div>
+                  <div className="bg-[#fff9db] text-[#916912] rounded-xl px-2 py-1 flex flex-col items-center gap-0 font-black shadow-sm border border-[#fff3bf] shrink-0">
+                    <span className="text-[#bf9106] text-[8px]">★</span>
+                    <span className="text-lg leading-none">{student.points}</span>
+                  </div>
                 </div>
-                <div className="bg-[#fff5f5] border border-[#ffcccc] rounded-xl p-1.5 flex flex-col items-center justify-center shadow-sm">
-                  <div className="text-[#e74c3c] font-bold text-[9px] leading-tight">NEG / 減分</div>
-                  <div className="text-[#e74c3c] font-black text-base leading-tight">-{student.minusPoints}</div>
+
+                {/* Stats Footer */}
+                <div className="w-full grid grid-cols-2 gap-1 mt-auto">
+                  <div className="bg-[#ebfaf2] border border-[#c3f2d7] rounded-xl p-1 flex flex-col items-center justify-center shadow-sm">
+                    <div className="text-[#2ecc71] font-bold text-[8px] leading-tight">POS / 加分</div>
+                    <div className="text-[#2ecc71] font-black text-sm leading-tight">+{student.plusPoints}</div>
+                  </div>
+                  <div className="bg-[#fff5f5] border border-[#ffcccc] rounded-xl p-1 flex flex-col items-center justify-center shadow-sm">
+                    <div className="text-[#e74c3c] font-bold text-[8px] leading-tight">NEG / 減分</div>
+                    <div className="text-[#e74c3c] font-black text-sm leading-tight">-{student.minusPoints}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -386,16 +403,16 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Score Apply Modal - PINK HEADER AND ROUNDED EDGES */}
+      {/* Score Apply Modal */}
       {showScoreModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-[3rem] w-full max-w-5xl max-h-[98vh] overflow-y-auto shadow-2xl relative border-[8px] border-pink-200">
             
-            {/* Header Section - Changed to Pink and ensure rounded top */}
-            <div className="bg-pink-500 p-4 text-white relative rounded-t-[2.5rem] flex items-center gap-5">
+            {/* Header Section */}
+            <div className="bg-[#ff92a9] p-4 text-white relative rounded-t-[2.5rem] flex items-center gap-5">
               {currentlySelectedStudents.length === 1 ? (
                 <>
-                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center p-1.5 border-4 border-pink-300 shadow-lg">
+                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center p-1.5 border-4 border-pink-200 shadow-lg">
                     <img 
                       src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${currentlySelectedStudents[0].pokemonId}.png`} 
                       className="w-full h-full object-contain"
@@ -423,82 +440,84 @@ const App: React.FC = () => {
 
             {/* Content Body */}
             <div className="p-6">
-              {/* Manual Input Container */}
-              <div className="bg-[#f8f9fa] border-2 border-dashed border-gray-200 rounded-3xl p-4 mb-6 max-w-3xl mx-auto shadow-inner">
-                <h4 className="text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest text-center">MANUAL INPUT / 手動輸入</h4>
-                <div className="flex items-center gap-2 justify-center">
-                  <input 
-                    type="number"
-                    placeholder="Points..."
-                    value={manualInput}
-                    onChange={(e) => setManualInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && manualInput) {
-                        applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
-                      }
-                    }}
-                    className="w-48 px-4 py-2 bg-white rounded-xl border border-gray-300 focus:border-blue-400 outline-none font-bold text-lg text-gray-700 text-center shadow-sm"
-                  />
-                  <button 
-                    onClick={() => {
-                      if (manualInput) {
-                        applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
-                      }
-                    }}
-                    className="px-6 py-2 bg-[#3498db] text-white rounded-xl font-bold text-base hover:bg-blue-600 shadow-md transition-all active:scale-95 whitespace-nowrap"
-                  >
-                    Apply / 應用
-                  </button>
-                </div>
-              </div>
-
-              {/* Action Lists */}
-              <div className="flex flex-col md:flex-row gap-8 justify-center">
-                {/* Positive Column */}
-                <div className="flex-1 max-w-md">
-                  <div className="flex items-center gap-2 mb-4 px-2 border-b-2 border-green-50 pb-2">
-                    <span className="text-xl">⭐</span>
-                    <h3 className="text-lg font-black text-green-500 uppercase tracking-widest">POSITIVE / 加分行為</h3>
-                  </div>
-                  <div className="space-y-2">
-                    {POSITIVE_ACTIONS.map(action => (
-                      <button
-                        key={action.label}
-                        onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
-                        className="w-full px-4 py-2 bg-[#ebfaf2] hover:bg-[#d8f5e6] rounded-xl text-left border border-[#c3f2d7] flex items-center gap-3 transition-all group active:scale-[0.98] shadow-sm"
-                      >
-                        <span className="text-xl group-hover:scale-125 transition inline-block w-6 text-center">{action.icon}</span>
-                        <div className="flex-1 flex items-baseline gap-2 overflow-hidden">
-                          <div className="font-bold text-green-700 text-sm md:text-base leading-tight shrink-0">{action.label}</div>
-                          <div className="text-[10px] text-green-400 italic opacity-80 uppercase font-medium truncate">{action.labelEn}</div>
-                        </div>
-                        <div className="text-xl font-black text-[#2ecc71] ml-auto">+{action.value}</div>
-                      </button>
-                    ))}
+              <div className="max-w-4xl mx-auto space-y-6">
+                {/* Manual Input Container */}
+                <div className="bg-[#f8f9fa] border-2 border-dashed border-gray-200 rounded-3xl p-4 shadow-inner">
+                  <h4 className="text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest text-center">MANUAL INPUT / 手動輸入</h4>
+                  <div className="flex items-center gap-2 justify-center">
+                    <input 
+                      type="number"
+                      placeholder="Points..."
+                      value={manualInput}
+                      onChange={(e) => setManualInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && manualInput) {
+                          applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
+                        }
+                      }}
+                      className="w-48 px-4 py-2 bg-white rounded-xl border border-gray-300 focus:border-blue-400 outline-none font-bold text-lg text-gray-700 text-center shadow-sm"
+                    />
+                    <button 
+                      onClick={() => {
+                        if (manualInput) {
+                          applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
+                        }
+                      }}
+                      className="px-6 py-2 bg-[#3498db] text-white rounded-xl font-bold text-base hover:bg-blue-600 shadow-md transition-all active:scale-95 whitespace-nowrap"
+                    >
+                      Apply / 應用
+                    </button>
                   </div>
                 </div>
 
-                {/* Negative Column */}
-                <div className="flex-1 max-w-md">
-                  <div className="flex items-center gap-2 mb-4 px-2 border-b-2 border-red-50 pb-2">
-                    <span className="text-xl">⚠️</span>
-                    <h3 className="text-lg font-black text-red-500 uppercase tracking-widest">NEGATIVE / 減分行為</h3>
+                {/* Action Lists */}
+                <div className="flex flex-col md:flex-row gap-8 justify-center">
+                  {/* Positive Column */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-4 px-2 border-b-2 border-green-50 pb-2">
+                      <span className="text-xl">⭐</span>
+                      <h3 className="text-lg font-black text-green-500 uppercase tracking-widest">POSITIVE / 加分行為</h3>
+                    </div>
+                    <div className="space-y-2">
+                      {POSITIVE_ACTIONS.map(action => (
+                        <button
+                          key={action.label}
+                          onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
+                          className="w-full px-4 py-2 bg-[#ebfaf2] hover:bg-[#d8f5e6] rounded-xl text-left border border-[#c3f2d7] flex items-center gap-3 transition-all group active:scale-[0.98] shadow-sm"
+                        >
+                          <span className="text-xl group-hover:scale-125 transition inline-block w-6 text-center">{action.icon}</span>
+                          <div className="flex-1 flex items-baseline gap-2 overflow-hidden">
+                            <div className="font-bold text-green-700 text-sm md:text-base leading-tight shrink-0">{action.label}</div>
+                            <div className="text-[10px] text-green-400 italic opacity-80 uppercase font-medium truncate">{action.labelEn}</div>
+                          </div>
+                          <div className="text-xl font-black text-[#2ecc71] ml-auto">+{action.value}</div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    {NEGATIVE_ACTIONS.map(action => (
-                      <button
-                        key={action.label}
-                        onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
-                        className="w-full px-4 py-2 bg-[#fff5f5] hover:bg-[#ffe3e3] rounded-xl text-left border border-[#ffcccc] flex items-center gap-3 transition-all group active:scale-[0.98] shadow-sm"
-                      >
-                        <span className="text-xl group-hover:scale-125 transition inline-block w-6 text-center">{action.icon}</span>
-                        <div className="flex-1 flex items-baseline gap-2 overflow-hidden">
-                          <div className="font-bold text-red-700 text-sm md:text-base leading-tight shrink-0">{action.label}</div>
-                          <div className="text-[10px] text-red-400 italic opacity-80 uppercase font-medium truncate">{action.labelEn}</div>
-                        </div>
-                        <div className="text-xl font-black text-[#e74c3c] ml-auto">{action.value}</div>
-                      </button>
-                    ))}
+
+                  {/* Negative Column */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-4 px-2 border-b-2 border-red-50 pb-2">
+                      <span className="text-xl">⚠️</span>
+                      <h3 className="text-lg font-black text-red-500 uppercase tracking-widest">NEGATIVE / 減分行為</h3>
+                    </div>
+                    <div className="space-y-2">
+                      {NEGATIVE_ACTIONS.map(action => (
+                        <button
+                          key={action.label}
+                          onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
+                          className="w-full px-4 py-2 bg-[#fff5f5] hover:bg-[#ffe3e3] rounded-xl text-left border border-[#ffcccc] flex items-center gap-3 transition-all group active:scale-[0.98] shadow-sm"
+                        >
+                          <span className="text-xl group-hover:scale-125 transition inline-block w-6 text-center">{action.icon}</span>
+                          <div className="flex-1 flex items-baseline gap-2 overflow-hidden">
+                            <div className="font-bold text-red-700 text-sm md:text-base leading-tight shrink-0">{action.label}</div>
+                            <div className="text-[10px] text-red-400 italic opacity-80 uppercase font-medium truncate">{action.labelEn}</div>
+                          </div>
+                          <div className="text-xl font-black text-[#e74c3c] ml-auto">{action.value}</div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
