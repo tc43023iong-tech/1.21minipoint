@@ -278,7 +278,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Student Grid Container - Redesigned Card Based on Image */}
+        {/* Student Grid Container - Reference Style */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {sortedStudents.map((student, idx) => (
             <div 
@@ -287,14 +287,14 @@ const App: React.FC = () => {
                 setSelectedStudents([student.id]);
                 setShowScoreModal(true);
               }}
-              className={`relative bg-white rounded-[2.5rem] p-6 transition-all cursor-pointer group hover:scale-105 hover:shadow-2xl flex flex-col items-center ${
+              className={`relative bg-white rounded-[2.5rem] p-6 transition-all cursor-pointer group hover:scale-[1.03] flex flex-col items-center ${
                 selectedStudents.includes(student.id) 
                 ? 'ring-4 ring-pink-400 shadow-pink-200 shadow-xl bg-pink-50' 
-                : 'shadow-xl shadow-pink-100/50'
+                : 'shadow-xl shadow-pink-100/30'
               }`}
             >
               {/* Pokemon Image */}
-              <div className="relative w-32 h-32 mb-4 group-hover:animate-bounce">
+              <div className="relative w-28 h-28 mb-4 group-hover:scale-110 transition-transform duration-300">
                 <img 
                   src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${student.pokemonId}.png`}
                   alt="Pokemon"
@@ -312,25 +312,25 @@ const App: React.FC = () => {
               </div>
 
               {/* Name Display */}
-              <h3 className="text-3xl font-black text-slate-800 mb-4 truncate w-full text-center">
+              <h3 className="text-2xl font-black text-[#2c3e50] mb-4 truncate w-full text-center">
                 {student.name}
               </h3>
 
-              {/* Point Badge */}
-              <div className="bg-yellow-50 text-amber-700 rounded-full px-5 py-2 inline-flex items-center gap-2 font-bold shadow-sm mb-6">
-                <span className="text-xl">⭐</span>
-                <span className="text-2xl font-black">{student.points}</span>
+              {/* Point Badge - Reference Style */}
+              <div className="bg-[#fff9db] text-[#916912] rounded-full px-5 py-2 inline-flex items-center gap-2 font-black shadow-sm mb-6 border border-[#fff3bf]">
+                <span className="text-[#bf9106] text-xl">★</span>
+                <span className="text-2xl">{student.points}</span>
               </div>
 
-              {/* Stats Footer */}
-              <div className="w-full border-t border-slate-100 pt-4 flex justify-around">
+              {/* Stats Footer - Reference Style */}
+              <div className="w-full border-t border-slate-100 pt-5 flex justify-around">
                 <div className="text-center">
-                  <div className="text-green-500 font-black text-xl">+{student.plusPoints}</div>
-                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">POS</div>
+                  <div className="text-[#37b24d] font-black text-xl">+{student.plusPoints}</div>
+                  <div className="text-[11px] text-[#868e96] font-bold uppercase tracking-wider">POS</div>
                 </div>
                 <div className="text-center border-l border-slate-50 pl-6">
-                  <div className="text-red-500 font-black text-xl">-{student.minusPoints}</div>
-                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">NEG</div>
+                  <div className="text-[#f03e3e] font-black text-xl">-{student.minusPoints}</div>
+                  <div className="text-[11px] text-[#868e96] font-bold uppercase tracking-wider">NEG</div>
                 </div>
               </div>
             </div>
@@ -374,38 +374,39 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Score Apply Modal - Simplified */}
+      {/* Score Apply Modal - Refined Size */}
       {showScoreModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-[3rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl border-8 border-pink-300 relative">
             <button onClick={() => setShowScoreModal(false)} className="absolute top-8 right-8 text-4xl font-bold text-gray-300 hover:text-red-500 transition-colors z-10">&times;</button>
 
             {/* Prominent Student Display */}
-            <div className="mb-8 text-center pt-4">
+            <div className="mb-6 text-center pt-2">
               <div className="flex flex-wrap justify-center gap-6 mb-4">
                 {currentlySelectedStudents.map(s => (
                   <div key={s.id} className="flex flex-col items-center">
-                    <div className="w-24 h-24 bg-pink-50 rounded-full flex items-center justify-center p-2 mb-3 border-4 border-white shadow-xl relative overflow-hidden">
+                    <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center p-2 mb-2 border-4 border-white shadow-xl relative overflow-hidden">
                       <img 
                         src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${s.pokemonId}.png`} 
                         className="w-full h-full object-contain relative z-10"
                       />
                     </div>
-                    <span className="text-3xl font-black text-slate-800">#{s.id} {s.name}</span>
-                    <div className="bg-yellow-50 text-amber-700 rounded-full px-4 py-1 inline-flex items-center gap-1 font-bold shadow-sm mt-2">
-                       <span className="text-sm">⭐ 現時積分:</span>
-                       <span className="text-lg font-black">{s.points}</span>
+                    <span className="text-2xl font-black text-slate-800">#{s.id} {s.name}</span>
+                    <div className="bg-yellow-50 text-amber-700 rounded-full px-3 py-0.5 inline-flex items-center gap-1 font-bold shadow-sm mt-1">
+                       <span className="text-xs">⭐ 積分:</span>
+                       <span className="text-base font-black">{s.points}</span>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
             
-            <div className="mb-10 max-w-lg mx-auto">
-              <div className="flex gap-3">
+            {/* Smaller Manual Input Section */}
+            <div className="mb-8 max-w-sm mx-auto">
+              <div className="flex gap-2">
                 <input 
                   type="number"
-                  placeholder="輸入分數 / Manual points..."
+                  placeholder="輸入分數 / Manual..."
                   value={manualInput}
                   onChange={(e) => setManualInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -414,7 +415,7 @@ const App: React.FC = () => {
                       applyPoints(currentlySelectedStudents, amount, '手動輸入');
                     }
                   }}
-                  className="flex-1 px-6 py-4 bg-pink-50 rounded-[1.5rem] border-4 border-pink-100 focus:border-pink-300 outline-none font-black text-3xl text-pink-600 text-center placeholder:text-pink-200"
+                  className="flex-1 px-4 py-2 bg-pink-50 rounded-xl border-2 border-pink-100 focus:border-pink-300 outline-none font-bold text-xl text-pink-600 text-center placeholder:text-pink-300 placeholder:text-sm"
                 />
                 <button 
                   onClick={() => {
@@ -423,7 +424,7 @@ const App: React.FC = () => {
                       applyPoints(currentlySelectedStudents, amount, '手動輸入');
                     }
                   }}
-                  className="px-10 bg-pink-500 text-white rounded-[1.5rem] font-black text-2xl hover:bg-pink-600 shadow-lg transition-all active:scale-95"
+                  className="px-6 bg-pink-500 text-white rounded-xl font-bold text-lg hover:bg-pink-600 shadow-md transition-all active:scale-95"
                 >
                   OK
                 </button>
