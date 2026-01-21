@@ -278,7 +278,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Student Grid Container - Increased grid columns for wider layout */}
+        {/* Student Grid Container */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
           {sortedStudents.map((student, idx) => (
             <div 
@@ -293,6 +293,17 @@ const App: React.FC = () => {
                 : 'shadow-xl shadow-pink-100/30'
               }`}
             >
+              {/* Ranking Badge for Sort by Score */}
+              {(sortType === SortType.SCORE_HI_LO || sortType === SortType.SCORE_LO_HI) && (
+                <div className={`absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center font-black shadow-md border-2 z-10 text-lg
+                  ${idx === 0 ? 'bg-yellow-400 text-white border-yellow-200' : 
+                    idx === 1 ? 'bg-slate-300 text-white border-slate-100' :
+                    idx === 2 ? 'bg-amber-600 text-white border-amber-400' :
+                    'bg-pink-100 text-pink-500 border-white'}`}>
+                  {idx + 1}
+                </div>
+              )}
+
               {/* Pokemon Image */}
               <div className="relative w-28 h-28 mb-4 group-hover:scale-110 transition-transform duration-300">
                 <img 
@@ -316,13 +327,13 @@ const App: React.FC = () => {
                 {student.name}
               </h3>
 
-              {/* Point Badge - Reference Style */}
+              {/* Point Badge */}
               <div className="bg-[#fff9db] text-[#916912] rounded-full px-5 py-2 inline-flex items-center gap-2 font-black shadow-sm mb-6 border border-[#fff3bf]">
                 <span className="text-[#bf9106] text-xl">★</span>
                 <span className="text-2xl">{student.points}</span>
               </div>
 
-              {/* Stats Footer - Reference Style */}
+              {/* Stats Footer */}
               <div className="w-full border-t border-slate-100 pt-5 flex justify-around">
                 <div className="text-center">
                   <div className="text-[#37b24d] font-black text-xl">+{student.plusPoints}</div>
@@ -374,7 +385,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Score Apply Modal - Refined Size */}
+      {/* Score Apply Modal */}
       {showScoreModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-[3rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl border-8 border-pink-300 relative">
