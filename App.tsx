@@ -459,9 +459,9 @@ const App: React.FC = () => {
 
             {/* Content Body */}
             <div className="p-6">
-              <div className="max-w-4xl mx-auto space-y-6">
-                {/* Manual Input Container - HORIZONTAL LAYOUT as requested */}
-                <div className="bg-[#f8f9fa] border-2 border-dashed border-gray-200 rounded-3xl p-6 shadow-inner flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="max-w-4xl mx-auto space-y-4">
+                {/* Manual Input Container - REDUCED PADDING AND MARGINS */}
+                <div className="bg-[#f8f9fa] border-2 border-dashed border-gray-200 rounded-3xl px-6 py-3 shadow-inner flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="text-center sm:text-left shrink-0">
                     <h4 className="text-sm font-black text-gray-500 uppercase tracking-widest leading-none">MANUAL INPUT</h4>
                     <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">手動輸入</span>
@@ -478,7 +478,7 @@ const App: React.FC = () => {
                           applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
                         }
                       }}
-                      className="flex-1 sm:w-48 px-4 py-2 bg-white rounded-xl border-2 border-gray-300 focus:border-blue-400 outline-none font-bold text-xl text-gray-700 text-center shadow-sm"
+                      className="flex-1 sm:w-40 px-4 py-2 bg-white rounded-xl border-2 border-gray-300 focus:border-blue-400 outline-none font-bold text-lg text-gray-700 text-center shadow-sm"
                     />
                     <button 
                       onClick={() => {
@@ -486,7 +486,7 @@ const App: React.FC = () => {
                           applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
                         }
                       }}
-                      className="px-8 py-2.5 bg-[#3498db] text-white rounded-xl font-black text-lg hover:bg-blue-600 shadow-md transition-all active:scale-95 whitespace-nowrap"
+                      className="px-6 py-2 bg-[#3498db] text-white rounded-xl font-black text-base hover:bg-blue-600 shadow-md transition-all active:scale-95 whitespace-nowrap"
                     >
                       Apply / 應用
                     </button>
