@@ -66,6 +66,11 @@ const App: React.FC = () => {
     );
   };
 
+  const openScoreModalForSingle = (studentId: number) => {
+    setSelectedStudents([studentId]);
+    setShowScoreModal(true);
+  };
+
   const applyPoints = (targets: Student[], amount: number, reason: string) => {
     const isPositive = amount > 0;
     
@@ -293,21 +298,35 @@ const App: React.FC = () => {
             return (
               <div 
                 key={student.id}
-                onClick={() => toggleStudentSelection(student.id)}
+                onClick={() => openScoreModalForSingle(student.id)}
                 className={`relative bg-white rounded-[2.5rem] p-4 transition-all cursor-pointer group hover:scale-[1.03] flex flex-col items-center ${
                   isSelected 
                   ? 'ring-4 ring-pink-400 shadow-pink-200 shadow-xl bg-pink-50' 
                   : 'shadow-xl shadow-pink-100/30'
                 }`}
               >
-                {/* Tick Icon in Top Right */}
-                {isSelected && (
-                  <div className="absolute -top-2 -right-2 bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-4 border-white z-20 animate-in zoom-in duration-200">
-                    <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                )}
+                {/* Tick Toggle Area in Top Right - Decoupled from card scoring action */}
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleStudentSelection(student.id);
+                  }}
+                  className={`absolute -top-2 -right-2 w-10 h-10 flex items-center justify-center z-20 cursor-pointer group/tick`}
+                >
+                  {isSelected ? (
+                    <div className="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-4 border-white animate-in zoom-in duration-200 hover:scale-110 transition-transform">
+                      <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-100 text-gray-300 w-8 h-8 rounded-full flex items-center justify-center shadow-sm border-2 border-gray-200 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white hover:text-green-400 hover:border-green-200">
+                       <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
 
                 {/* Ranking Badge */}
                 {(sortType === SortType.SCORE_HI_LO || sortType === SortType.SCORE_LO_HI) && (
@@ -441,10 +460,14 @@ const App: React.FC = () => {
             {/* Content Body */}
             <div className="p-6">
               <div className="max-w-4xl mx-auto space-y-6">
-                {/* Manual Input Container */}
-                <div className="bg-[#f8f9fa] border-2 border-dashed border-gray-200 rounded-3xl p-4 shadow-inner">
-                  <h4 className="text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest text-center">MANUAL INPUT / 手動輸入</h4>
-                  <div className="flex items-center gap-2 justify-center">
+                {/* Manual Input Container - HORIZONTAL LAYOUT as requested */}
+                <div className="bg-[#f8f9fa] border-2 border-dashed border-gray-200 rounded-3xl p-6 shadow-inner flex flex-col sm:flex-row items-center justify-between gap-6">
+                  <div className="text-center sm:text-left shrink-0">
+                    <h4 className="text-sm font-black text-gray-500 uppercase tracking-widest leading-none">MANUAL INPUT</h4>
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">手動輸入</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
                     <input 
                       type="number"
                       placeholder="Points..."
@@ -455,7 +478,7 @@ const App: React.FC = () => {
                           applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
                         }
                       }}
-                      className="w-48 px-4 py-2 bg-white rounded-xl border border-gray-300 focus:border-blue-400 outline-none font-bold text-lg text-gray-700 text-center shadow-sm"
+                      className="flex-1 sm:w-48 px-4 py-2 bg-white rounded-xl border-2 border-gray-300 focus:border-blue-400 outline-none font-bold text-xl text-gray-700 text-center shadow-sm"
                     />
                     <button 
                       onClick={() => {
@@ -463,7 +486,7 @@ const App: React.FC = () => {
                           applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
                         }
                       }}
-                      className="px-6 py-2 bg-[#3498db] text-white rounded-xl font-bold text-base hover:bg-blue-600 shadow-md transition-all active:scale-95 whitespace-nowrap"
+                      className="px-8 py-2.5 bg-[#3498db] text-white rounded-xl font-black text-lg hover:bg-blue-600 shadow-md transition-all active:scale-95 whitespace-nowrap"
                     >
                       Apply / 應用
                     </button>
