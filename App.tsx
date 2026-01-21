@@ -173,6 +173,7 @@ const App: React.FC = () => {
   });
 
   const currentlySelectedStudents = currentClass.students.filter(s => selectedStudents.includes(s.id));
+  const studentForPokemon = showPokemonPicker !== null ? currentClass.students.find(s => s.id === showPokemonPicker) : null;
 
   return (
     <div className="max-w-[1600px] mx-auto p-4 md:p-8 lg:px-12 space-y-6">
@@ -305,7 +306,7 @@ const App: React.FC = () => {
                   : 'shadow-xl shadow-pink-100/30'
                 }`}
               >
-                {/* Tick Toggle Area in Top Right - Decoupled from card scoring action */}
+                {/* Tick Toggle Area */}
                 <div 
                   onClick={(e) => {
                     e.stopPropagation();
@@ -352,7 +353,7 @@ const App: React.FC = () => {
                   />
                 </div>
 
-                {/* ID, Name and Point Badge Container */}
+                {/* ID, Name and Point Badge */}
                 <div className="w-full flex justify-between items-center mb-4 px-1">
                   <div className="text-left flex-1 truncate mr-1">
                     <div className="text-pink-500 font-black text-xs md:text-sm">
@@ -390,8 +391,15 @@ const App: React.FC = () => {
       {showPokemonPicker !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[80vh] flex flex-col p-6 shadow-2xl border-8 border-yellow-400">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-yellow-600">Choose Pokemon / 選擇寶可夢</h2>
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex flex-col">
+                <h2 className="text-2xl font-bold text-yellow-600">Choose Pokemon / 選擇寶可夢</h2>
+                {studentForPokemon && (
+                  <p className="text-sm font-black text-gray-400 bg-gray-50 px-3 py-1 rounded-full mt-1 border border-gray-100">
+                    為 <span className="text-yellow-600">#{studentForPokemon.id} {studentForPokemon.name}</span> 挑選新搭檔
+                  </p>
+                )}
+              </div>
               <button onClick={() => setShowPokemonPicker(null)} className="text-3xl font-bold text-gray-400 hover:text-red-500">&times;</button>
             </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 overflow-y-auto p-2 scroll-hide">
@@ -422,52 +430,53 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Score Apply Modal */}
+      {/* Score Apply Modal - RESIZED TO MATCH POKEMON PICKER */}
       {showScoreModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-[3rem] w-full max-w-5xl max-h-[98vh] overflow-y-auto shadow-2xl relative border-[8px] border-pink-200">
+          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl relative border-8 border-pink-200 overflow-hidden">
             
-            {/* Header Section */}
-            <div className="bg-[#ff92a9] p-4 text-white relative rounded-t-[2.5rem] flex items-center gap-5">
+            {/* Modal Header */}
+            <div className="bg-[#ff92a9] p-4 text-white shrink-0 flex items-center gap-4">
               {currentlySelectedStudents.length === 1 ? (
                 <>
-                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center p-1.5 border-4 border-pink-200 shadow-lg">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center p-1 border-2 border-pink-200 shadow-md">
                     <img 
                       src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${currentlySelectedStudents[0].pokemonId}.png`} 
                       className="w-full h-full object-contain"
                     />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-2xl font-black">#{currentlySelectedStudents[0].id} {currentlySelectedStudents[0].name}</h2>
-                    <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-0.5 inline-flex items-center gap-1.5 mt-1 border border-white/30">
-                       <span className="text-xs font-bold">⭐ 當前積分:</span>
-                       <span className="text-xl font-black">{currentlySelectedStudents[0].points}</span>
+                    <h2 className="text-xl font-black leading-tight">#{currentlySelectedStudents[0].id} {currentlySelectedStudents[0].name}</h2>
+                    <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5 inline-flex items-center gap-1 mt-0.5 border border-white/30">
+                       <span className="text-[10px] font-bold">⭐ 當前積分:</span>
+                       <span className="text-sm font-black">{currentlySelectedStudents[0].points}</span>
                     </div>
                   </div>
                 </>
               ) : (
                 <div className="flex-1 text-center">
-                  <h2 className="text-2xl font-black">已選定 {currentlySelectedStudents.length} 位學生</h2>
-                  <p className="opacity-80 font-bold text-sm">MULTIPLE STUDENTS SELECTED</p>
+                  <h2 className="text-xl font-black">已選定 {currentlySelectedStudents.length} 位學生</h2>
+                  <p className="opacity-80 font-bold text-[10px] uppercase">MULTIPLE STUDENTS SELECTED</p>
                 </div>
               )}
               <button 
                 onClick={() => setShowScoreModal(false)} 
-                className="absolute top-4 right-6 text-3xl font-black text-white hover:scale-110 transition-transform"
+                className="text-3xl font-black text-white hover:scale-110 transition-transform"
               >&times;</button>
             </div>
 
-            {/* Content Body */}
-            <div className="p-6">
-              <div className="max-w-4xl mx-auto space-y-4">
-                {/* Manual Input Container - REDUCED PADDING AND MARGINS */}
-                <div className="bg-[#f8f9fa] border-2 border-dashed border-gray-200 rounded-3xl px-6 py-3 shadow-inner flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="text-center sm:text-left shrink-0">
-                    <h4 className="text-sm font-black text-gray-500 uppercase tracking-widest leading-none">MANUAL INPUT</h4>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">手動輸入</span>
+            {/* Modal Body - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 scroll-hide bg-[#fffafb]">
+              <div className="space-y-6">
+                
+                {/* Manual Input Section */}
+                <div className="bg-white border-2 border-dashed border-pink-100 rounded-2xl px-5 py-3 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="shrink-0">
+                    <h4 className="text-xs font-black text-pink-400 uppercase tracking-widest leading-none">MANUAL INPUT</h4>
+                    <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">手動輸入</span>
                   </div>
                   
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
                     <input 
                       type="number"
                       placeholder="Points..."
@@ -478,7 +487,7 @@ const App: React.FC = () => {
                           applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
                         }
                       }}
-                      className="flex-1 sm:w-40 px-4 py-2 bg-white rounded-xl border-2 border-gray-300 focus:border-blue-400 outline-none font-bold text-lg text-gray-700 text-center shadow-sm"
+                      className="flex-1 sm:w-32 px-3 py-1.5 bg-gray-50 rounded-xl border-2 border-gray-200 focus:border-pink-300 outline-none font-bold text-base text-gray-700 text-center transition-colors"
                     />
                     <button 
                       onClick={() => {
@@ -486,58 +495,58 @@ const App: React.FC = () => {
                           applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
                         }
                       }}
-                      className="px-6 py-2 bg-[#3498db] text-white rounded-xl font-black text-base hover:bg-blue-600 shadow-md transition-all active:scale-95 whitespace-nowrap"
+                      className="px-6 py-1.5 bg-pink-400 text-white rounded-xl font-black text-sm hover:bg-pink-500 shadow-sm transition-all active:scale-95 whitespace-nowrap"
                     >
                       Apply / 應用
                     </button>
                   </div>
                 </div>
 
-                {/* Action Lists */}
-                <div className="flex flex-col md:flex-row gap-8 justify-center">
+                {/* Actions Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Positive Column */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-4 px-2 border-b-2 border-green-50 pb-2">
-                      <span className="text-xl">⭐</span>
-                      <h3 className="text-lg font-black text-green-500 uppercase tracking-widest">POSITIVE / 加分行為</h3>
+                  <div>
+                    <div className="flex items-center gap-2 mb-3 px-2 border-b-2 border-green-50 pb-1">
+                      <span className="text-lg">⭐</span>
+                      <h3 className="text-sm font-black text-green-500 uppercase tracking-widest">POSITIVE / 加分</h3>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {POSITIVE_ACTIONS.map(action => (
                         <button
                           key={action.label}
                           onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
-                          className="w-full px-4 py-2 bg-[#ebfaf2] hover:bg-[#d8f5e6] rounded-xl text-left border border-[#c3f2d7] flex items-center gap-3 transition-all group active:scale-[0.98] shadow-sm"
+                          className="w-full px-3 py-1.5 bg-white hover:bg-green-50 rounded-xl text-left border border-gray-100 flex items-center gap-2 transition-all group active:scale-[0.98] shadow-sm"
                         >
-                          <span className="text-xl group-hover:scale-125 transition inline-block w-6 text-center">{action.icon}</span>
-                          <div className="flex-1 flex items-baseline gap-2 overflow-hidden">
-                            <div className="font-bold text-green-700 text-sm md:text-base leading-tight shrink-0">{action.label}</div>
-                            <div className="text-[10px] text-green-400 italic opacity-80 uppercase font-medium truncate">{action.labelEn}</div>
+                          <span className="text-lg group-hover:scale-125 transition inline-block w-5 text-center">{action.icon}</span>
+                          <div className="flex-1 flex flex-col leading-tight min-w-0">
+                            <div className="font-bold text-gray-700 text-xs truncate">{action.label}</div>
+                            <div className="text-[8px] text-gray-400 uppercase font-medium truncate opacity-60">{action.labelEn}</div>
                           </div>
-                          <div className="text-xl font-black text-[#2ecc71] ml-auto">+{action.value}</div>
+                          <div className="text-sm font-black text-[#2ecc71] ml-auto shrink-0">+{action.value}</div>
                         </button>
                       ))}
                     </div>
                   </div>
 
                   {/* Negative Column */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-4 px-2 border-b-2 border-red-50 pb-2">
-                      <span className="text-xl">⚠️</span>
-                      <h3 className="text-lg font-black text-red-500 uppercase tracking-widest">NEGATIVE / 減分行為</h3>
+                  <div>
+                    <div className="flex items-center gap-2 mb-3 px-2 border-b-2 border-red-50 pb-1">
+                      <span className="text-lg">⚠️</span>
+                      <h3 className="text-sm font-black text-red-500 uppercase tracking-widest">NEGATIVE / 減分</h3>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {NEGATIVE_ACTIONS.map(action => (
                         <button
                           key={action.label}
                           onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
-                          className="w-full px-4 py-2 bg-[#fff5f5] hover:bg-[#ffe3e3] rounded-xl text-left border border-[#ffcccc] flex items-center gap-3 transition-all group active:scale-[0.98] shadow-sm"
+                          className="w-full px-3 py-1.5 bg-white hover:bg-red-50 rounded-xl text-left border border-gray-100 flex items-center gap-2 transition-all group active:scale-[0.98] shadow-sm"
                         >
-                          <span className="text-xl group-hover:scale-125 transition inline-block w-6 text-center">{action.icon}</span>
-                          <div className="flex-1 flex items-baseline gap-2 overflow-hidden">
-                            <div className="font-bold text-red-700 text-sm md:text-base leading-tight shrink-0">{action.label}</div>
-                            <div className="text-[10px] text-red-400 italic opacity-80 uppercase font-medium truncate">{action.labelEn}</div>
+                          <span className="text-lg group-hover:scale-125 transition inline-block w-5 text-center">{action.icon}</span>
+                          <div className="flex-1 flex flex-col leading-tight min-w-0">
+                            <div className="font-bold text-gray-700 text-xs truncate">{action.label}</div>
+                            <div className="text-[8px] text-gray-400 uppercase font-medium truncate opacity-60">{action.labelEn}</div>
                           </div>
-                          <div className="text-xl font-black text-[#e74c3c] ml-auto">{action.value}</div>
+                          <div className="text-sm font-black text-[#e74c3c] ml-auto shrink-0">{action.value}</div>
                         </button>
                       ))}
                     </div>
@@ -546,8 +555,8 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Footer Text */}
-            <div className="text-center py-4 text-gray-300 font-black tracking-widest text-[10px] uppercase">
+            {/* Modal Footer */}
+            <div className="bg-white border-t border-gray-100 py-2 text-center text-gray-300 font-black tracking-widest text-[8px] uppercase shrink-0">
               MISS IONG'S CLASS SYSTEM
             </div>
           </div>
