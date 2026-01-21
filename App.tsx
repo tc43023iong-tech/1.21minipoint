@@ -278,8 +278,8 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Student Grid Container */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        {/* Student Grid Container - Redesigned Card Based on Image */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {sortedStudents.map((student, idx) => (
             <div 
               key={student.id}
@@ -287,37 +287,50 @@ const App: React.FC = () => {
                 setSelectedStudents([student.id]);
                 setShowScoreModal(true);
               }}
-              className={`relative bg-white rounded-2xl p-3 border-4 transition-all cursor-pointer group hover:scale-105 ${
-                selectedStudents.includes(student.id) ? 'border-pink-400 shadow-pink-200 shadow-lg bg-pink-50' : 'border-white shadow-md'
+              className={`relative bg-white rounded-[2.5rem] p-6 transition-all cursor-pointer group hover:scale-105 hover:shadow-2xl flex flex-col items-center ${
+                selectedStudents.includes(student.id) 
+                ? 'ring-4 ring-pink-400 shadow-pink-200 shadow-xl bg-pink-50' 
+                : 'shadow-xl shadow-pink-100/50'
               }`}
             >
-              {sortType !== SortType.ID && (
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-pink-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white z-10">
-                  {idx + 1}
+              {/* Pokemon Image */}
+              <div className="relative w-32 h-32 mb-4 group-hover:animate-bounce">
+                <img 
+                  src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${student.pokemonId}.png`}
+                  alt="Pokemon"
+                  className="w-full h-full object-contain pixelated"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowPokemonPicker(student.id);
+                  }}
+                />
+              </div>
+
+              {/* ID Display */}
+              <div className="text-pink-500 font-black text-xl mb-1">
+                #{student.id}
+              </div>
+
+              {/* Name Display */}
+              <h3 className="text-3xl font-black text-slate-800 mb-4 truncate w-full text-center">
+                {student.name}
+              </h3>
+
+              {/* Point Badge */}
+              <div className="bg-yellow-50 text-amber-700 rounded-full px-5 py-2 inline-flex items-center gap-2 font-bold shadow-sm mb-6">
+                <span className="text-xl">⭐</span>
+                <span className="text-2xl font-black">{student.points}</span>
+              </div>
+
+              {/* Stats Footer */}
+              <div className="w-full border-t border-slate-100 pt-4 flex justify-around">
+                <div className="text-center">
+                  <div className="text-green-500 font-black text-xl">+{student.plusPoints}</div>
+                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">POS</div>
                 </div>
-              )}
-              <div className="text-center">
-                <span className="text-xs font-bold text-gray-400 block">#{student.id}</span>
-                <div className="relative mx-auto w-16 h-16">
-                  <img 
-                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${student.pokemonId}.png`}
-                    alt="Pokemon"
-                    className="w-full h-full object-contain pixelated"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowPokemonPicker(student.id);
-                    }}
-                  />
-                </div>
-                <h3 className="font-bold text-gray-700 truncate mt-1">{student.name}</h3>
-                <div className="flex justify-center gap-1 mt-1">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-green-500 font-bold">+{student.plusPoints}</span>
-                    <span className="text-[10px] text-red-500 font-bold">-{student.minusPoints}</span>
-                  </div>
-                  <div className="flex items-center ml-1">
-                    <span className="text-lg font-black text-pink-500">{student.points}</span>
-                  </div>
+                <div className="text-center border-l border-slate-50 pl-6">
+                  <div className="text-red-500 font-black text-xl">-{student.minusPoints}</div>
+                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">NEG</div>
                 </div>
               </div>
             </div>
@@ -361,35 +374,38 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Score Apply Modal - Simplified as requested */}
+      {/* Score Apply Modal - Simplified */}
       {showScoreModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl border-8 border-pink-300 relative">
-            <button onClick={() => setShowScoreModal(false)} className="absolute top-6 right-6 text-4xl font-bold text-gray-300 hover:text-red-500 transition-colors z-10">&times;</button>
+          <div className="bg-white rounded-[3rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl border-8 border-pink-300 relative">
+            <button onClick={() => setShowScoreModal(false)} className="absolute top-8 right-8 text-4xl font-bold text-gray-300 hover:text-red-500 transition-colors z-10">&times;</button>
 
             {/* Prominent Student Display */}
-            <div className="mb-8 text-center">
-              <div className="flex flex-wrap justify-center gap-4 mb-4">
+            <div className="mb-8 text-center pt-4">
+              <div className="flex flex-wrap justify-center gap-6 mb-4">
                 {currentlySelectedStudents.map(s => (
                   <div key={s.id} className="flex flex-col items-center">
-                    <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center p-2 mb-2 border-2 border-pink-100 shadow-sm relative overflow-hidden">
+                    <div className="w-24 h-24 bg-pink-50 rounded-full flex items-center justify-center p-2 mb-3 border-4 border-white shadow-xl relative overflow-hidden">
                       <img 
                         src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${s.pokemonId}.png`} 
                         className="w-full h-full object-contain relative z-10"
                       />
                     </div>
-                    <span className="text-2xl font-black text-pink-600">#{s.id} {s.name}</span>
-                    <span className="text-sm font-bold text-pink-300">當前分數: {s.points}</span>
+                    <span className="text-3xl font-black text-slate-800">#{s.id} {s.name}</span>
+                    <div className="bg-yellow-50 text-amber-700 rounded-full px-4 py-1 inline-flex items-center gap-1 font-bold shadow-sm mt-2">
+                       <span className="text-sm">⭐ 現時積分:</span>
+                       <span className="text-lg font-black">{s.points}</span>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
             
             <div className="mb-10 max-w-lg mx-auto">
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <input 
                   type="number"
-                  placeholder="輸入自定義分數 / Manual points..."
+                  placeholder="輸入分數 / Manual points..."
                   value={manualInput}
                   onChange={(e) => setManualInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -398,7 +414,7 @@ const App: React.FC = () => {
                       applyPoints(currentlySelectedStudents, amount, '手動輸入');
                     }
                   }}
-                  className="flex-1 px-6 py-4 bg-pink-50 rounded-2xl border-4 border-pink-100 focus:border-pink-300 outline-none font-black text-2xl text-pink-600 text-center placeholder:text-pink-200"
+                  className="flex-1 px-6 py-4 bg-pink-50 rounded-[1.5rem] border-4 border-pink-100 focus:border-pink-300 outline-none font-black text-3xl text-pink-600 text-center placeholder:text-pink-200"
                 />
                 <button 
                   onClick={() => {
@@ -407,7 +423,7 @@ const App: React.FC = () => {
                       applyPoints(currentlySelectedStudents, amount, '手動輸入');
                     }
                   }}
-                  className="px-8 bg-pink-500 text-white rounded-2xl font-black text-xl hover:bg-pink-600 shadow-lg transition-all active:scale-95"
+                  className="px-10 bg-pink-500 text-white rounded-[1.5rem] font-black text-2xl hover:bg-pink-600 shadow-lg transition-all active:scale-95"
                 >
                   OK
                 </button>
@@ -468,7 +484,7 @@ const App: React.FC = () => {
       {/* Result Overlay */}
       {scoreResult && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/20 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white rounded-3xl p-10 shadow-2xl border-[12px] border-pink-400 text-center max-w-md w-full m-4">
+          <div className="bg-white rounded-[3rem] p-10 shadow-2xl border-[12px] border-pink-400 text-center max-w-md w-full m-4">
             <h2 className="text-4xl font-black mb-2 animate-bounce">
               {scoreResult.isPositive ? 'CONGRATULATIONS!' : 'KEEP WORKING HARD!'}
             </h2>
@@ -479,25 +495,28 @@ const App: React.FC = () => {
             <div className="space-y-4 py-4 border-y-4 border-dotted border-pink-100 my-4">
               {scoreResult.students.length === 1 ? (
                 <>
-                  <p className="text-2xl font-bold text-gray-700">#{scoreResult.students[0].id} {scoreResult.students[0].name}</p>
-                  <div className="mx-auto w-32 h-32 bg-pink-50 rounded-full flex items-center justify-center p-4">
+                  <p className="text-3xl font-black text-slate-800">#{scoreResult.students[0].id} {scoreResult.students[0].name}</p>
+                  <div className="mx-auto w-40 h-40 bg-pink-50 rounded-full flex items-center justify-center p-4 shadow-inner">
                     <img 
                       src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${scoreResult.students[0].pokemonId}.png`} 
                       className="w-full h-full object-contain"
                     />
                   </div>
-                  <p className="text-3xl font-black text-pink-600">
+                  <p className="text-4xl font-black text-pink-600">
                     {scoreResult.points > 0 ? '+' : ''}{scoreResult.points} {scoreResult.reason}
                   </p>
-                  <p className="text-lg font-bold text-gray-400">當前分數: <span className="text-pink-500 text-3xl">{scoreResult.students[0].newTotal}</span></p>
+                  <div className="bg-yellow-50 text-amber-700 rounded-full px-6 py-2 inline-flex items-center gap-2 font-black shadow-md mt-2">
+                    <span className="text-lg">⭐ 最新總分:</span>
+                    <span className="text-3xl">{scoreResult.students[0].newTotal}</span>
+                  </div>
                 </>
               ) : (
                 <>
-                  <p className="text-xl font-bold text-gray-700">多選評分 ({scoreResult.students.length} 位學生)</p>
-                  <p className="text-3xl font-black text-pink-600">
+                  <p className="text-2xl font-bold text-gray-700">多選評分 ({scoreResult.students.length} 位學生)</p>
+                  <p className="text-4xl font-black text-pink-600">
                     {scoreResult.points > 0 ? '+' : ''}{scoreResult.points} {scoreResult.reason}
                   </p>
-                  <p className="text-lg font-bold text-gray-400 italic">Scores updated / 分數已更新</p>
+                  <p className="text-xl font-bold text-pink-400 mt-4 italic">Scores updated! / 分數已更新</p>
                 </>
               )}
             </div>
@@ -508,24 +527,24 @@ const App: React.FC = () => {
       {/* Random Picker Overlay */}
       {showRandomPicker && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md">
-          <div className="bg-white rounded-3xl p-10 shadow-2xl border-[12px] border-red-400 text-center max-w-lg w-full m-4">
+          <div className="bg-white rounded-[3rem] p-10 shadow-2xl border-[12px] border-red-400 text-center max-w-lg w-full m-4">
             <h2 className="text-3xl font-black text-red-500 mb-6 uppercase">🔍 Searching / 抽取中... ({pickedHistory.length}/{currentClass.students.length})</h2>
-            <div className="h-64 flex items-center justify-center bg-red-50 rounded-2xl mb-6 relative overflow-hidden">
+            <div className="h-72 flex items-center justify-center bg-red-50 rounded-[2rem] mb-6 relative overflow-hidden border-4 border-red-100">
               {flashingStudent && !randomPickResult && (
                 <div className="animate-pulse">
-                  <div className="mx-auto w-32 h-32">
+                  <div className="mx-auto w-40 h-40">
                     <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${flashingStudent.pokemonId}.png`} className="w-full h-full object-contain" />
                   </div>
-                  <p className="text-3xl font-black text-red-600 mt-4">#{flashingStudent.id} {flashingStudent.name}</p>
+                  <p className="text-4xl font-black text-red-600 mt-4">#{flashingStudent.id} {flashingStudent.name}</p>
                 </div>
               )}
               {randomPickResult && (
                 <div className="scale-110 animate-in zoom-in duration-300">
-                  <div className="mx-auto w-40 h-40">
+                  <div className="mx-auto w-48 h-48">
                     <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomPickResult.pokemonId}.png`} className="w-full h-full object-contain" />
                   </div>
-                  <p className="text-5xl font-black text-pink-600 mt-4">#{randomPickResult.id} {randomPickResult.name}</p>
-                  <p className="text-lg font-bold text-pink-400 mt-2">I CHOOSE YOU! / 就決定是你了！</p>
+                  <p className="text-6xl font-black text-pink-600 mt-4">#{randomPickResult.id} {randomPickResult.name}</p>
+                  <p className="text-xl font-bold text-pink-400 mt-2 uppercase tracking-widest">I CHOOSE YOU! / 就決定是你了！</p>
                 </div>
               )}
             </div>
@@ -537,13 +556,13 @@ const App: React.FC = () => {
                     setShowRandomPicker(false);
                     setShowScoreModal(true);
                   }}
-                  className="flex-1 py-4 bg-pink-500 text-white rounded-2xl font-black text-xl hover:bg-pink-600 shadow-lg active:scale-95 transition"
+                  className="flex-1 py-5 bg-pink-500 text-white rounded-[1.5rem] font-black text-2xl hover:bg-pink-600 shadow-lg active:scale-95 transition"
                 >
                   評分
                 </button>
                 <button 
                   onClick={() => setShowRandomPicker(false)}
-                  className="px-8 py-4 bg-gray-200 text-gray-700 rounded-2xl font-black text-xl hover:bg-gray-300 transition"
+                  className="px-10 py-5 bg-slate-100 text-slate-500 rounded-[1.5rem] font-black text-2xl hover:bg-slate-200 transition"
                 >
                   CLOSE
                 </button>
@@ -556,30 +575,31 @@ const App: React.FC = () => {
       {/* Rules Modal */}
       {showRules && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl border-8 border-yellow-300">
-            <h2 className="text-2xl font-black text-yellow-600 mb-6 flex items-center gap-2">
-              🔔 默書/測驗/考試 加分細則 <br/> Rules for Tests & Exams
+          <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl border-8 border-yellow-300">
+            <h2 className="text-3xl font-black text-yellow-600 mb-8 flex flex-col items-center gap-2 text-center">
+              <span className="text-5xl">🔔</span>
+              默書/測驗/考試 加分細則 <br/> <span className="text-sm font-bold opacity-50 uppercase tracking-widest">Rules for Tests & Exams</span>
             </h2>
             <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-xl font-bold">
-                <span>100 或以上</span><span className="text-green-500">+25</span>
+              <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-2xl font-black text-xl border-b-4 border-yellow-100">
+                <span className="text-slate-700">100 或以上</span><span className="text-green-500">+25</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-xl font-bold">
-                <span>90 ～ 99</span><span className="text-green-500">+20</span>
+              <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-2xl font-black text-xl border-b-4 border-yellow-100">
+                <span className="text-slate-700">90 ～ 99</span><span className="text-green-500">+20</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-xl font-bold">
-                <span>80 ～ 89</span><span className="text-green-500">+15</span>
+              <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-2xl font-black text-xl border-b-4 border-yellow-100">
+                <span className="text-slate-700">80 ～ 89</span><span className="text-green-500">+15</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-xl font-bold">
-                <span>70 ～ 79</span><span className="text-green-500">+10</span>
+              <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-2xl font-black text-xl border-b-4 border-yellow-100">
+                <span className="text-slate-700">70 ～ 79</span><span className="text-green-500">+10</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-xl font-bold">
-                <span>60 ～ 69</span><span className="text-green-500">+5</span>
+              <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-2xl font-black text-xl border-b-4 border-yellow-100">
+                <span className="text-slate-700">60 ～ 69</span><span className="text-green-500">+5</span>
               </div>
             </div>
             <button 
               onClick={() => setShowRules(false)}
-              className="w-full mt-8 py-4 bg-yellow-400 text-white rounded-2xl font-bold hover:bg-yellow-500 transition shadow-lg"
+              className="w-full mt-10 py-5 bg-yellow-400 text-white rounded-[1.5rem] font-black text-2xl hover:bg-yellow-500 transition shadow-lg active:scale-95"
             >
               GOT IT! / 知道了
             </button>
