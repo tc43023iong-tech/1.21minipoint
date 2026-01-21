@@ -17,13 +17,13 @@
         /* Firework Animation */
         .firework {
           position: fixed;
-          width: 6px;
-          height: 6px;
+          width: 8px;
+          height: 8px;
           border-radius: 50%;
           box-shadow: 0 0 #fff;
           animation: fireworks 1.5s infinite;
           pointer-events: none;
-          z-index: 101;
+          z-index: 150;
         }
 
         @keyframes fireworks {
@@ -33,16 +33,16 @@
             opacity: 1;
           }
           100% { 
-            transform: translate(-50%, -50%) scale(1.5);
+            transform: translate(-50%, -50%) scale(2);
             box-shadow: 
-              -120px -120px 0 2px #ff6b6b, 
-              120px -120px 0 2px #4ecdc4, 
-              120px 120px 0 2px #ffe66d, 
-              -120px 120px 0 2px #ff9ff3, 
-              0 -180px 0 2px #a29bfe, 
-              0 180px 0 2px #55efc4,
-              -180px 0 0 2px #ff7675,
-              180px 0 0 2px #fdcb6e; 
+              -120px -120px 0 3px #ff6b6b, 
+              120px -120px 0 3px #4ecdc4, 
+              120px 120px 0 3px #ffe66d, 
+              -120px 120px 0 3px #ff9ff3, 
+              0 -180px 0 3px #a29bfe, 
+              0 180px 0 3px #55efc4,
+              -180px 0 0 3px #ff7675,
+              180px 0 0 3px #fdcb6e; 
             opacity: 0; 
           }
         }
@@ -71,11 +71,6 @@
 </head>
 <body class="bg-pink-50 min-h-screen">
     <div id="root"></div>
-    <!-- Simple Background Firework Elements -->
-    <div class="firework" style="left: 15%; top: 20%; animation-delay: 0.2s; opacity: 0.3;"></div>
-    <div class="firework" style="left: 85%; top: 15%; animation-delay: 0.7s; opacity: 0.3;"></div>
-    <div class="firework" style="left: 45%; top: 80%; animation-delay: 1.4s; opacity: 0.3;"></div>
-
     <script type="module" src="/index.tsx"></script>
 </body>
 </html>

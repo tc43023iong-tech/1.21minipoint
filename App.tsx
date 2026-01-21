@@ -9,7 +9,7 @@ import {
   INITIAL_CLASSES, 
   POSITIVE_ACTIONS, 
   NEGATIVE_ACTIONS, 
-  POKEMON_COUNT,
+  POKEMON_COUNT, 
   POKEMON_NAMES
 } from './constants';
 import { audioService } from './services/audioService';
@@ -385,105 +385,139 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Score Apply Modal */}
+      {/* Score Apply Modal - Compact and Widened layout */}
       {showScoreModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-[3rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl border-8 border-pink-300 relative">
-            <button onClick={() => setShowScoreModal(false)} className="absolute top-8 right-8 text-4xl font-bold text-gray-300 hover:text-red-500 transition-colors z-10">&times;</button>
+          <div className="bg-white rounded-[3rem] w-full max-w-6xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl border-8 border-pink-300 relative">
+            <button onClick={() => setShowScoreModal(false)} className="absolute top-6 right-8 text-4xl font-bold text-gray-300 hover:text-red-500 transition-colors z-20">&times;</button>
 
-            {/* Prominent Student Display */}
-            <div className="mb-6 text-center pt-2">
-              <div className="flex flex-wrap justify-center gap-6 mb-4">
-                {currentlySelectedStudents.map(s => (
-                  <div key={s.id} className="flex flex-col items-center">
-                    <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center p-2 mb-2 border-4 border-white shadow-xl relative overflow-hidden">
-                      <img 
-                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${s.pokemonId}.png`} 
-                        className="w-full h-full object-contain relative z-10"
-                      />
+            {/* Split top section: Info Left, Input Right (shifted slightly left) */}
+            <div className="flex flex-col md:flex-row items-center gap-12 mb-10 pb-8 border-b-4 border-pink-50 pr-4 md:pr-12">
+              
+              <div className="flex-1 flex flex-wrap justify-center md:justify-start gap-8">
+                {currentlySelectedStudents.length > 1 ? (
+                  <div className="flex items-center gap-8 py-2">
+                    <div className="flex -space-x-8 items-center">
+                      {currentlySelectedStudents.slice(0, 3).map((s, idx) => (
+                        <div key={s.id} style={{ zIndex: 10 - idx }} className="w-24 h-24 bg-pink-50 rounded-full flex items-center justify-center p-2 border-4 border-white shadow-xl relative overflow-hidden">
+                          <img 
+                            src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${s.pokemonId}.png`} 
+                            className="w-full h-full object-contain relative z-10"
+                          />
+                        </div>
+                      ))}
+                      {currentlySelectedStudents.length > 3 && (
+                        <div className="w-12 h-12 bg-pink-400 text-white rounded-full flex items-center justify-center font-black border-4 border-white shadow-lg z-0">
+                          +{currentlySelectedStudents.length - 3}
+                        </div>
+                      )}
                     </div>
-                    <span className="text-2xl font-black text-slate-800">#{s.id} {s.name}</span>
-                    <div className="bg-yellow-50 text-amber-700 rounded-full px-3 py-0.5 inline-flex items-center gap-1 font-bold shadow-sm mt-1">
-                       <span className="text-xs">⭐ 積分:</span>
-                       <span className="text-base font-black">{s.points}</span>
+                    <div className="text-left">
+                      <div className="text-5xl font-black text-slate-800 tracking-tight">
+                        {currentlySelectedStudents.length} <span className="text-2xl ml-1">名學生</span>
+                      </div>
+                      <div className="text-pink-400 font-bold uppercase tracking-widest text-sm mt-1">已全選或多選 / Multiple Selected</div>
                     </div>
                   </div>
-                ))}
+                ) : (
+                  currentlySelectedStudents.map(s => (
+                    <div key={s.id} className="flex items-center gap-6">
+                      <div className="w-24 h-24 bg-pink-50 rounded-full flex items-center justify-center p-2 border-4 border-white shadow-xl relative overflow-hidden">
+                        <img 
+                          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${s.pokemonId}.png`} 
+                          className="w-full h-full object-contain relative z-10"
+                        />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-3xl font-black text-slate-800">#{s.id} {s.name}</div>
+                        <div className="bg-yellow-50 text-amber-700 rounded-full px-4 py-1 inline-flex items-center gap-2 font-bold shadow-sm mt-2 border border-yellow-100">
+                           <span className="text-sm">⭐ 當前積分:</span>
+                           <span className="text-2xl font-black">{s.points}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
-            </div>
-            
-            {/* Smaller Manual Input Section */}
-            <div className="mb-8 max-w-sm mx-auto">
-              <div className="flex gap-2">
-                <input 
-                  type="number"
-                  placeholder="輸入分數 / Manual..."
-                  value={manualInput}
-                  onChange={(e) => setManualInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && manualInput) {
-                      const amount = parseInt(manualInput);
-                      applyPoints(currentlySelectedStudents, amount, '手動輸入');
-                    }
-                  }}
-                  className="flex-1 px-4 py-2 bg-pink-50 rounded-xl border-2 border-pink-100 focus:border-pink-300 outline-none font-bold text-xl text-pink-600 text-center placeholder:text-pink-300 placeholder:text-sm"
-                />
-                <button 
-                  onClick={() => {
-                    if (manualInput) {
-                      const amount = parseInt(manualInput);
-                      applyPoints(currentlySelectedStudents, amount, '手動輸入');
-                    }
-                  }}
-                  className="px-6 bg-pink-500 text-white rounded-xl font-bold text-lg hover:bg-pink-600 shadow-md transition-all active:scale-95"
-                >
-                  OK
-                </button>
+
+              <div className="w-full md:w-72 md:mr-12">
+                <div className="bg-white p-6 rounded-3xl border-4 border-pink-100 shadow-lg relative z-10">
+                  <h4 className="text-sm font-bold text-pink-400 mb-3 uppercase tracking-widest text-center">手動輸入 / Manual</h4>
+                  <div className="flex gap-2">
+                    <input 
+                      type="number"
+                      placeholder="分數"
+                      value={manualInput}
+                      onChange={(e) => setManualInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && manualInput) {
+                          const amount = parseInt(manualInput);
+                          applyPoints(currentlySelectedStudents, amount, '手動輸入');
+                        }
+                      }}
+                      className="flex-1 px-4 py-2 bg-pink-50 rounded-xl border-2 border-pink-100 focus:border-pink-300 outline-none font-bold text-xl text-pink-600 text-center w-full"
+                    />
+                    <button 
+                      onClick={() => {
+                        if (manualInput) {
+                          const amount = parseInt(manualInput);
+                          applyPoints(currentlySelectedStudents, amount, '手動輸入');
+                        }
+                      }}
+                      className="px-5 bg-pink-500 text-white rounded-xl font-bold text-lg hover:bg-pink-600 shadow-md transition-all active:scale-95 whitespace-nowrap"
+                    >
+                      OK
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
+            {/* Bottom Section: Positive/Negative actions - Narrower layout */}
+            <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-16">
+              {/* Positive Column */}
+              <div className="flex-1 max-w-md">
                 <div className="flex items-center gap-3 mb-4 px-2">
                   <span className="text-2xl">⭐</span>
-                  <h3 className="text-xl font-black text-green-500 uppercase tracking-widest">Positive / 加分項目</h3>
+                  <h3 className="text-xl font-black text-green-500 uppercase tracking-widest">Positive / 加分</h3>
                 </div>
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 gap-2">
                   {POSITIVE_ACTIONS.map(action => (
                     <button
                       key={action.label}
                       onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
-                      className="w-full p-4 bg-green-50 hover:bg-green-100 rounded-2xl text-left border-2 border-green-100 flex items-center gap-4 transition group active:scale-[0.98]"
+                      className="w-full p-3 bg-green-50 hover:bg-green-100 rounded-xl text-left border border-green-100 flex items-center gap-3 transition group active:scale-[0.98]"
                     >
-                      <span className="text-3xl group-hover:scale-125 transition inline-block w-10 text-center">{action.icon}</span>
-                      <div className="flex-1">
-                        <div className="font-black text-green-700 text-lg leading-tight">{action.label}</div>
-                        <div className="text-[10px] text-green-400 uppercase font-bold">{action.labelEn}</div>
+                      <span className="text-2xl group-hover:scale-125 transition inline-block w-8 text-center">{action.icon}</span>
+                      <div className="flex-1 flex flex-wrap items-baseline gap-2">
+                        <div className="font-black text-green-700 text-base leading-tight whitespace-nowrap">{action.label}</div>
+                        <div className="text-[10px] text-green-400 uppercase font-bold opacity-70 truncate">{action.labelEn}</div>
                       </div>
-                      <div className="text-2xl font-black text-green-500 bg-white px-4 py-1 rounded-xl shadow-sm">+{action.value}</div>
+                      <div className="text-xl font-black text-green-500 bg-white px-3 py-0.5 rounded-lg shadow-sm">+{action.value}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div>
+              {/* Negative Column */}
+              <div className="flex-1 max-w-md">
                 <div className="flex items-center gap-3 mb-4 px-2">
                   <span className="text-2xl">⚠️</span>
-                  <h3 className="text-xl font-black text-red-500 uppercase tracking-widest">Negative / 減分項目</h3>
+                  <h3 className="text-xl font-black text-red-500 uppercase tracking-widest">Negative / 減分</h3>
                 </div>
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 gap-2">
                   {NEGATIVE_ACTIONS.map(action => (
                     <button
                       key={action.label}
                       onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
-                      className="w-full p-4 bg-red-50 hover:bg-red-100 rounded-2xl text-left border-2 border-red-100 flex items-center gap-4 transition group active:scale-[0.98]"
+                      className="w-full p-3 bg-red-50 hover:bg-red-100 rounded-xl text-left border border-red-100 flex items-center gap-3 transition group active:scale-[0.98]"
                     >
-                      <span className="text-3xl group-hover:scale-125 transition inline-block w-10 text-center">{action.icon}</span>
-                      <div className="flex-1">
-                        <div className="font-black text-red-700 text-lg leading-tight">{action.label}</div>
-                        <div className="text-[10px] text-red-400 uppercase font-bold">{action.labelEn}</div>
+                      <span className="text-2xl group-hover:scale-125 transition inline-block w-8 text-center">{action.icon}</span>
+                      <div className="flex-1 flex flex-wrap items-baseline gap-2">
+                        <div className="font-black text-red-700 text-base leading-tight whitespace-nowrap">{action.label}</div>
+                        <div className="text-[10px] text-red-400 uppercase font-bold opacity-70 truncate">{action.labelEn}</div>
                       </div>
-                      <div className="text-2xl font-black text-red-500 bg-white px-4 py-1 rounded-xl shadow-sm">{action.value}</div>
+                      <div className="text-xl font-black text-red-500 bg-white px-3 py-0.5 rounded-lg shadow-sm">{action.value}</div>
                     </button>
                   ))}
                 </div>
@@ -496,14 +530,13 @@ const App: React.FC = () => {
       {/* Result Overlay */}
       {scoreResult && (
         <div className={`fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-md animate-in fade-in duration-300 ${scoreResult.isPositive ? 'bg-white/30' : 'bg-pink-100/50'}`}>
-          {/* Active Fireworks for positive result */}
           {scoreResult.isPositive && (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              {[...Array(6)].map((_, i) => (
+              {[...Array(8)].map((_, i) => (
                 <div key={i} className="firework" style={{ 
-                  left: `${10 + Math.random() * 80}%`, 
+                  left: `${5 + Math.random() * 90}%`, 
                   top: `${10 + Math.random() * 80}%`, 
-                  animationDelay: `${i * 0.3}s`
+                  animationDelay: `${i * 0.2}s`
                 }}></div>
               ))}
             </div>
