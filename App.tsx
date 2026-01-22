@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { 
   Student, 
   ClassData, 
@@ -25,6 +25,7 @@ const App: React.FC = () => {
   
   // Modals
   const [showPokemonPicker, setShowPokemonPicker] = useState<number | null>(null); // student ID
+  const [pokemonSearchQuery, setPokemonSearchQuery] = useState('');
   const [showScoreModal, setShowScoreModal] = useState<boolean>(false);
   const [scoreResult, setScoreResult] = useState<{
     students: { name: string, id: number, pokemonId: number, newTotal: number }[],
@@ -175,10 +176,22 @@ const App: React.FC = () => {
   const currentlySelectedStudents = currentClass.students.filter(s => selectedStudents.includes(s.id));
   const studentForPokemon = showPokemonPicker !== null ? currentClass.students.find(s => s.id === showPokemonPicker) : null;
 
+  const filteredPokemonList = useMemo(() => {
+    const q = pokemonSearchQuery.toLowerCase().trim();
+    const list = Array.from({ length: POKEMON_COUNT }).map((_, i) => i + 1);
+    if (!q) return list;
+    return list.filter(id => {
+      const name = POKEMON_NAMES[id];
+      const matchName = name && (name.zh.toLowerCase().includes(q) || name.en.toLowerCase().includes(q));
+      const matchId = id.toString().includes(q);
+      return matchName || matchId;
+    });
+  }, [pokemonSearchQuery]);
+
   return (
     <div className="max-w-[1600px] mx-auto p-4 md:p-8 lg:px-12 space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-xl border-4 border-pink-200">
+      <div className="flex flex-col md:flex-row justify-between items-center bg-white/80 backdrop-blur-md p-6 rounded-[2.5rem] shadow-[0_20px_40px_-10px_rgba(255,192,203,0.3)] border-4 border-pink-100">
         <div className="text-center md:text-left">
           <h1 className="text-4xl font-bold text-pink-600 drop-shadow-sm">Miss Iong's Class</h1>
           <p className="text-pink-400 font-semibold mt-1">⭐ Point Management System / 學生積分系統 ⭐</p>
@@ -217,7 +230,7 @@ const App: React.FC = () => {
 
       <div className="space-y-4">
         {/* Control Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 bg-white/80 p-4 rounded-2xl border-2 border-pink-100 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-white/80 p-4 rounded-3xl border-2 border-pink-50 shadow-[0_15px_30px_-10px_rgba(255,192,203,0.2)]">
           <div className="flex flex-wrap gap-2">
             <button 
               onClick={() => setSortType(SortType.ID)}
@@ -293,17 +306,17 @@ const App: React.FC = () => {
         </div>
 
         {/* Student Grid Container */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 md:gap-8 pt-4">
           {sortedStudents.map((student, idx) => {
             const isSelected = selectedStudents.includes(student.id);
             return (
               <div 
                 key={student.id}
                 onClick={() => openScoreModalForSingle(student.id)}
-                className={`relative bg-white rounded-[2.5rem] p-4 transition-all cursor-pointer group hover:scale-[1.03] flex flex-col items-center ${
+                className={`relative bg-white rounded-[3rem] p-6 transition-all cursor-pointer group hover:scale-[1.03] flex flex-col items-center border border-pink-50/50 ${
                   isSelected 
-                  ? 'ring-4 ring-pink-400 shadow-pink-200 shadow-xl bg-pink-50' 
-                  : 'shadow-xl shadow-pink-100/30'
+                  ? 'ring-4 ring-pink-400 shadow-[0_25px_50px_-12px_rgba(244,114,182,0.4)] bg-pink-50/50' 
+                  : 'shadow-[0_20px_40px_-10px_rgba(255,192,203,0.5)]'
                 }`}
               >
                 {/* Tick Toggle Area */}
@@ -312,17 +325,17 @@ const App: React.FC = () => {
                     e.stopPropagation();
                     toggleStudentSelection(student.id);
                   }}
-                  className={`absolute -top-2 -right-2 w-10 h-10 flex items-center justify-center z-20 cursor-pointer group/tick`}
+                  className="absolute -top-3 -right-3 w-12 h-12 flex items-center justify-center z-20 cursor-pointer"
                 >
                   {isSelected ? (
-                    <div className="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-4 border-white animate-in zoom-in duration-200 hover:scale-110 transition-transform">
-                      <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                    <div className="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg border-4 border-white animate-in zoom-in duration-200 hover:scale-110 transition-transform">
+                      <svg className="w-6 h-6 fill-current" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
                   ) : (
-                    <div className="bg-gray-100 text-gray-300 w-8 h-8 rounded-full flex items-center justify-center shadow-sm border-2 border-gray-200 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white hover:text-green-400 hover:border-green-200">
-                       <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                    <div className="bg-gray-100 text-gray-300 w-10 h-10 rounded-full flex items-center justify-center shadow-sm border-2 border-gray-200 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white hover:text-green-400 hover:border-green-200">
+                       <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
@@ -331,7 +344,7 @@ const App: React.FC = () => {
 
                 {/* Ranking Badge */}
                 {(sortType === SortType.SCORE_HI_LO || sortType === SortType.SCORE_LO_HI) && (
-                  <div className={`absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center font-black shadow-md border-2 z-10 text-base
+                  <div className={`absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center font-black shadow-md border-4 z-10 text-lg
                     ${idx === 0 ? 'bg-yellow-400 text-white border-yellow-200' : 
                       idx === 1 ? 'bg-slate-300 text-white border-slate-100' :
                       idx === 2 ? 'bg-amber-600 text-white border-amber-400' :
@@ -341,44 +354,45 @@ const App: React.FC = () => {
                 )}
 
                 {/* Pokemon Image */}
-                <div className="relative w-20 h-20 mb-2 group-hover:scale-110 transition-transform duration-300">
+                <div className="relative w-28 h-28 mb-4 group-hover:scale-110 transition-transform duration-300">
                   <img 
                     src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${student.pokemonId}.png`}
                     alt="Pokemon"
-                    className="w-full h-full object-contain pixelated"
+                    className="w-full h-full object-contain pixelated drop-shadow-md"
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowPokemonPicker(student.id);
+                      setPokemonSearchQuery('');
                     }}
                   />
                 </div>
 
-                {/* ID, Name and Point Badge */}
-                <div className="w-full flex justify-between items-center mb-4 px-1">
-                  <div className="text-left flex-1 truncate mr-1">
-                    <div className="text-pink-500 font-black text-xs md:text-sm">
+                {/* ID, Name and Point Badge Container - MATCHING SCREENSHOT */}
+                <div className="w-full flex justify-between items-end mb-6">
+                  <div className="text-left flex-1 truncate">
+                    <div className="text-pink-500 font-black text-sm mb-1">
                       #{student.id}
                     </div>
-                    <h3 className="text-lg font-black text-[#2c3e50] truncate">
+                    <h3 className="text-2xl font-black text-[#2c3e50] truncate tracking-tight">
                       {student.name}
                     </h3>
                   </div>
 
-                  <div className="bg-[#fff9db] text-[#916912] rounded-xl px-2 py-1 flex flex-col items-center gap-0 font-black shadow-sm border border-[#fff3bf] shrink-0">
-                    <span className="text-[#bf9106] text-[8px]">★</span>
-                    <span className="text-lg leading-none">{student.points}</span>
+                  <div className="bg-[#fff9db] text-[#916912] rounded-2xl px-3 py-1 flex flex-col items-center gap-0 font-black shadow-sm border border-[#fff3bf] shrink-0 min-w-[50px] transform translate-y-2">
+                    <span className="text-[#bf9106] text-xs">★</span>
+                    <span className="text-2xl leading-none">{student.points}</span>
                   </div>
                 </div>
 
-                {/* Stats Footer */}
-                <div className="w-full grid grid-cols-2 gap-1 mt-auto">
-                  <div className="bg-[#ebfaf2] border border-[#c3f2d7] rounded-xl p-1 flex flex-col items-center justify-center shadow-sm">
-                    <div className="text-[#2ecc71] font-bold text-[8px] leading-tight">POS / 加分</div>
-                    <div className="text-[#2ecc71] font-black text-sm leading-tight">+{student.plusPoints}</div>
+                {/* Stats Footer - MATCHING SCREENSHOT PILLS */}
+                <div className="w-full grid grid-cols-2 gap-2 mt-auto">
+                  <div className="bg-[#ebfaf2] border border-[#c3f2d7] rounded-2xl py-2 flex flex-col items-center justify-center shadow-sm hover:brightness-95 transition">
+                    <div className="text-[#2ecc71] font-bold text-[10px] leading-tight uppercase">POS / 加分</div>
+                    <div className="text-[#2ecc71] font-black text-xl leading-tight">+{student.plusPoints}</div>
                   </div>
-                  <div className="bg-[#fff5f5] border border-[#ffcccc] rounded-xl p-1 flex flex-col items-center justify-center shadow-sm">
-                    <div className="text-[#e74c3c] font-bold text-[8px] leading-tight">NEG / 減分</div>
-                    <div className="text-[#e74c3c] font-black text-sm leading-tight">-{student.minusPoints}</div>
+                  <div className="bg-[#fff5f5] border border-[#ffcccc] rounded-2xl py-2 flex flex-col items-center justify-center shadow-sm hover:brightness-95 transition">
+                    <div className="text-[#e74c3c] font-bold text-[10px] leading-tight uppercase">NEG / 減分</div>
+                    <div className="text-[#e74c3c] font-black text-xl leading-tight">-{student.minusPoints}</div>
                   </div>
                 </div>
               </div>
@@ -390,21 +404,38 @@ const App: React.FC = () => {
       {/* Pokemon Picker Modal */}
       {showPokemonPicker !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[80vh] flex flex-col p-6 shadow-2xl border-8 border-yellow-400">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex flex-col">
-                <h2 className="text-2xl font-bold text-yellow-600">Choose Pokemon / 選擇寶可夢</h2>
+          <div className="bg-white rounded-[3rem] w-full max-w-4xl max-h-[80vh] flex flex-col p-8 shadow-2xl border-8 border-yellow-400 overflow-hidden">
+            <div className="flex justify-between items-start mb-6 shrink-0">
+              <div className="flex flex-col flex-1">
+                <h2 className="text-3xl font-black text-yellow-600 leading-tight">Choose Pokemon / 選擇寶可夢</h2>
                 {studentForPokemon && (
-                  <p className="text-sm font-black text-gray-400 bg-gray-50 px-3 py-1 rounded-full mt-1 border border-gray-100">
+                  <p className="text-base font-black text-gray-400 bg-gray-50 px-4 py-1 rounded-full mt-2 border border-gray-100 inline-block w-fit">
                     為 <span className="text-yellow-600">#{studentForPokemon.id} {studentForPokemon.name}</span> 挑選新搭檔
                   </p>
                 )}
               </div>
-              <button onClick={() => setShowPokemonPicker(null)} className="text-3xl font-bold text-gray-400 hover:text-red-500">&times;</button>
+              <button onClick={() => setShowPokemonPicker(null)} className="text-4xl font-black text-gray-300 hover:text-red-500 ml-4 transition-colors">&times;</button>
             </div>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 overflow-y-auto p-2 scroll-hide">
-              {Array.from({ length: POKEMON_COUNT }).map((_, i) => {
-                const id = i + 1;
+
+            <div className="mb-6 shrink-0">
+              <div className="relative">
+                <input 
+                  type="text"
+                  placeholder="搜索寶可夢名字或編號 (e.g. 皮卡丘, 25)..."
+                  value={pokemonSearchQuery}
+                  onChange={(e) => setPokemonSearchQuery(e.target.value)}
+                  className="w-full px-6 py-4 bg-gray-50 rounded-[2rem] border-4 border-transparent focus:border-yellow-400 focus:bg-white outline-none font-bold text-gray-700 transition-all shadow-inner text-lg"
+                />
+                <div className="absolute right-6 top-1/2 -translate-y-1/2 text-yellow-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 overflow-y-auto p-2 flex-1 scroll-hide">
+              {filteredPokemonList.map((id) => {
                 const name = POKEMON_NAMES[id];
                 return (
                   <button 
@@ -413,73 +444,82 @@ const App: React.FC = () => {
                       updateStudent(showPokemonPicker!, { pokemonId: id });
                       setShowPokemonPicker(null);
                     }}
-                    className="flex flex-col items-center bg-gray-50 rounded-xl p-2 hover:bg-yellow-100 transition border-2 border-transparent hover:border-yellow-300"
+                    className="flex flex-col items-center bg-white rounded-3xl p-4 hover:bg-yellow-50 transition border-2 border-gray-100 hover:border-yellow-300 shadow-sm group active:scale-95"
                   >
-                    <img 
-                      src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`}
-                      alt="poke"
-                      className="w-14 h-14"
-                    />
-                    <span className="text-[10px] font-bold text-gray-400">#{id}</span>
-                    <span className="text-[10px] text-gray-600 font-bold truncate w-full text-center">{name?.zh || `Poke #${id}`}</span>
+                    <div className="relative w-20 h-20 group-hover:scale-110 transition-transform">
+                      <img 
+                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`}
+                        alt="poke"
+                        className="w-full h-full object-contain pixelated"
+                      />
+                    </div>
+                    <span className="text-xs font-black text-yellow-500 mt-2">#{id}</span>
+                    <span className="text-sm text-gray-700 font-bold truncate w-full text-center">
+                      {name?.zh || `Poke #${id}`}
+                    </span>
+                    <span className="text-[10px] text-gray-400 uppercase font-bold truncate w-full text-center opacity-50">
+                      {name?.en || ''}
+                    </span>
                   </button>
                 );
               })}
+              {filteredPokemonList.length === 0 && (
+                <div className="col-span-full py-20 text-center">
+                  <p className="text-2xl font-black text-gray-300 uppercase tracking-widest">No Pokemon found / 找不到相關寶可夢</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Score Apply Modal - RESIZED TO MATCH POKEMON PICKER */}
+      {/* Score Apply Modal */}
       {showScoreModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl relative border-8 border-pink-200 overflow-hidden">
+          <div className="bg-white rounded-[3rem] w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl relative border-8 border-pink-200 overflow-hidden">
             
-            {/* Modal Header */}
-            <div className="bg-[#ff92a9] p-4 text-white shrink-0 flex items-center gap-4">
+            <div className="bg-[#ff92a9] p-6 text-white shrink-0 flex items-center gap-6">
               {currentlySelectedStudents.length === 1 ? (
                 <>
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center p-1 border-2 border-pink-200 shadow-md">
+                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center p-1.5 border-4 border-pink-200 shadow-lg">
                     <img 
                       src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${currentlySelectedStudents[0].pokemonId}.png`} 
                       className="w-full h-full object-contain"
                     />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-xl font-black leading-tight">#{currentlySelectedStudents[0].id} {currentlySelectedStudents[0].name}</h2>
-                    <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5 inline-flex items-center gap-1 mt-0.5 border border-white/30">
-                       <span className="text-[10px] font-bold">⭐ 當前積分:</span>
-                       <span className="text-sm font-black">{currentlySelectedStudents[0].points}</span>
+                    <h2 className="text-2xl font-black leading-tight">#{currentlySelectedStudents[0].id} {currentlySelectedStudents[0].name}</h2>
+                    <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 inline-flex items-center gap-2 mt-1 border border-white/30">
+                       <span className="text-xs font-bold uppercase tracking-wider">Current Points:</span>
+                       <span className="text-2xl font-black leading-none">{currentlySelectedStudents[0].points}</span>
                     </div>
                   </div>
                 </>
               ) : (
                 <div className="flex-1 text-center">
-                  <h2 className="text-xl font-black">已選定 {currentlySelectedStudents.length} 位學生</h2>
-                  <p className="opacity-80 font-bold text-[10px] uppercase">MULTIPLE STUDENTS SELECTED</p>
+                  <h2 className="text-2xl font-black">已選定 {currentlySelectedStudents.length} 位學生</h2>
+                  <p className="opacity-80 font-bold text-xs uppercase tracking-widest mt-1">MULTIPLE STUDENTS SELECTED</p>
                 </div>
               )}
               <button 
                 onClick={() => setShowScoreModal(false)} 
-                className="text-3xl font-black text-white hover:scale-110 transition-transform"
+                className="text-4xl font-black text-white hover:scale-110 transition-transform"
               >&times;</button>
             </div>
 
-            {/* Modal Body - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 scroll-hide bg-[#fffafb]">
-              <div className="space-y-6">
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 scroll-hide bg-[#fffafb]">
+              <div className="space-y-8 max-w-3xl mx-auto">
                 
-                {/* Manual Input Section */}
-                <div className="bg-white border-2 border-dashed border-pink-100 rounded-2xl px-5 py-3 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="shrink-0">
-                    <h4 className="text-xs font-black text-pink-400 uppercase tracking-widest leading-none">MANUAL INPUT</h4>
-                    <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">手動輸入</span>
+                <div className="bg-white border-4 border-dashed border-pink-100 rounded-[2rem] px-8 py-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
+                  <div className="shrink-0 text-center sm:text-left">
+                    <h4 className="text-sm font-black text-pink-400 uppercase tracking-widest leading-none">MANUAL INPUT</h4>
+                    <span className="text-xs font-bold text-gray-300 uppercase tracking-widest mt-1 inline-block">手動輸入</span>
                   </div>
                   
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="flex items-center gap-4 w-full sm:w-auto">
                     <input 
                       type="number"
-                      placeholder="Points..."
+                      placeholder="Pts..."
                       value={manualInput}
                       onChange={(e) => setManualInput(e.target.value)}
                       onKeyDown={(e) => {
@@ -487,7 +527,7 @@ const App: React.FC = () => {
                           applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
                         }
                       }}
-                      className="flex-1 sm:w-32 px-3 py-1.5 bg-gray-50 rounded-xl border-2 border-gray-200 focus:border-pink-300 outline-none font-bold text-base text-gray-700 text-center transition-colors"
+                      className="flex-1 sm:w-40 px-6 py-3 bg-gray-50 rounded-2xl border-4 border-gray-100 focus:border-pink-300 outline-none font-bold text-xl text-gray-700 text-center transition-all"
                     />
                     <button 
                       onClick={() => {
@@ -495,58 +535,55 @@ const App: React.FC = () => {
                           applyPoints(currentlySelectedStudents, parseInt(manualInput), '手動輸入');
                         }
                       }}
-                      className="px-6 py-1.5 bg-pink-400 text-white rounded-xl font-black text-sm hover:bg-pink-500 shadow-sm transition-all active:scale-95 whitespace-nowrap"
+                      className="px-8 py-3 bg-pink-400 text-white rounded-2xl font-black text-lg hover:bg-pink-500 shadow-md transition-all active:scale-95 whitespace-nowrap"
                     >
                       Apply / 應用
                     </button>
                   </div>
                 </div>
 
-                {/* Actions Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Positive Column */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <div className="flex items-center gap-2 mb-3 px-2 border-b-2 border-green-50 pb-1">
-                      <span className="text-lg">⭐</span>
-                      <h3 className="text-sm font-black text-green-500 uppercase tracking-widest">POSITIVE / 加分</h3>
+                    <div className="flex items-center gap-3 mb-4 px-2 border-b-4 border-green-50 pb-2">
+                      <span className="text-2xl">⭐</span>
+                      <h3 className="text-lg font-black text-green-500 uppercase tracking-widest">POSITIVE / 加分</h3>
                     </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       {POSITIVE_ACTIONS.map(action => (
                         <button
                           key={action.label}
                           onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
-                          className="w-full px-3 py-1.5 bg-white hover:bg-green-50 rounded-xl text-left border border-gray-100 flex items-center gap-2 transition-all group active:scale-[0.98] shadow-sm"
+                          className="w-full px-4 py-3 bg-white hover:bg-green-50 rounded-2xl text-left border border-gray-100 flex items-center gap-3 transition-all group active:scale-[0.98] shadow-sm"
                         >
-                          <span className="text-lg group-hover:scale-125 transition inline-block w-5 text-center">{action.icon}</span>
+                          <span className="text-2xl group-hover:scale-125 transition inline-block w-8 text-center">{action.icon}</span>
                           <div className="flex-1 flex flex-col leading-tight min-w-0">
-                            <div className="font-bold text-gray-700 text-xs truncate">{action.label}</div>
-                            <div className="text-[8px] text-gray-400 uppercase font-medium truncate opacity-60">{action.labelEn}</div>
+                            <div className="font-bold text-gray-700 text-sm md:text-base truncate">{action.label}</div>
+                            <div className="text-[10px] text-gray-400 uppercase font-medium truncate opacity-60 mt-0.5">{action.labelEn}</div>
                           </div>
-                          <div className="text-sm font-black text-[#2ecc71] ml-auto shrink-0">+{action.value}</div>
+                          <div className="text-xl font-black text-[#2ecc71] ml-auto shrink-0">+{action.value}</div>
                         </button>
                       ))}
                     </div>
                   </div>
 
-                  {/* Negative Column */}
                   <div>
-                    <div className="flex items-center gap-2 mb-3 px-2 border-b-2 border-red-50 pb-1">
-                      <span className="text-lg">⚠️</span>
-                      <h3 className="text-sm font-black text-red-500 uppercase tracking-widest">NEGATIVE / 減分</h3>
+                    <div className="flex items-center gap-3 mb-4 px-2 border-b-4 border-red-50 pb-2">
+                      <span className="text-2xl">⚠️</span>
+                      <h3 className="text-lg font-black text-red-500 uppercase tracking-widest">NEGATIVE / 減分</h3>
                     </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       {NEGATIVE_ACTIONS.map(action => (
                         <button
                           key={action.label}
                           onClick={() => applyPoints(currentlySelectedStudents, action.value, action.label)}
-                          className="w-full px-3 py-1.5 bg-white hover:bg-red-50 rounded-xl text-left border border-gray-100 flex items-center gap-2 transition-all group active:scale-[0.98] shadow-sm"
+                          className="w-full px-4 py-3 bg-white hover:bg-red-50 rounded-2xl text-left border border-gray-100 flex items-center gap-3 transition-all group active:scale-[0.98] shadow-sm"
                         >
-                          <span className="text-lg group-hover:scale-125 transition inline-block w-5 text-center">{action.icon}</span>
+                          <span className="text-2xl group-hover:scale-125 transition inline-block w-8 text-center">{action.icon}</span>
                           <div className="flex-1 flex flex-col leading-tight min-w-0">
-                            <div className="font-bold text-gray-700 text-xs truncate">{action.label}</div>
-                            <div className="text-[8px] text-gray-400 uppercase font-medium truncate opacity-60">{action.labelEn}</div>
+                            <div className="font-bold text-gray-700 text-sm md:text-base truncate">{action.label}</div>
+                            <div className="text-[10px] text-gray-400 uppercase font-medium truncate opacity-60 mt-0.5">{action.labelEn}</div>
                           </div>
-                          <div className="text-sm font-black text-[#e74c3c] ml-auto shrink-0">{action.value}</div>
+                          <div className="text-xl font-black text-[#e74c3c] ml-auto shrink-0">{action.value}</div>
                         </button>
                       ))}
                     </div>
@@ -555,8 +592,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Modal Footer */}
-            <div className="bg-white border-t border-gray-100 py-2 text-center text-gray-300 font-black tracking-widest text-[8px] uppercase shrink-0">
+            <div className="bg-white border-t border-gray-50 py-3 text-center text-gray-300 font-black tracking-[0.3em] text-[10px] uppercase shrink-0">
               MISS IONG'S CLASS SYSTEM
             </div>
           </div>
@@ -578,43 +614,47 @@ const App: React.FC = () => {
             </div>
           )}
 
-          <div className={`rounded-[3rem] p-10 shadow-2xl border-[12px] text-center max-w-md w-full m-4 relative z-10 transition-colors duration-500
+          <div className={`rounded-[4rem] p-12 shadow-[0_50px_100px_-20px_rgba(244,114,182,0.5)] border-[16px] text-center max-w-lg w-full m-4 relative z-10 transition-colors duration-500
             ${scoreResult.isPositive 
               ? 'bg-white border-pink-400' 
               : 'bg-pink-100 border-pink-300'}`}>
             
-            <h2 className="text-4xl font-black mb-2 animate-bounce uppercase">
-              {scoreResult.isPositive ? 'CONGRATULATIONS!' : 'KEEP WORKING HARD!'}
+            <h2 className="text-5xl font-black mb-2 animate-bounce uppercase tracking-tighter">
+              {scoreResult.isPositive ? 'CONGRATS!' : 'OH NO!'}
             </h2>
-            <h3 className={`text-2xl font-bold mb-6 ${scoreResult.isPositive ? 'text-pink-500' : 'text-pink-600'}`}>
-              {scoreResult.isPositive ? '恭喜你！' : '繼續努力！'}
+            <h3 className={`text-3xl font-bold mb-8 ${scoreResult.isPositive ? 'text-pink-500' : 'text-pink-600'}`}>
+              {scoreResult.isPositive ? '表現出色！' : '請多加油！'}
             </h3>
             
-            <div className={`space-y-4 py-4 border-y-4 border-dotted my-4 ${scoreResult.isPositive ? 'border-pink-100' : 'border-pink-200'}`}>
+            <div className={`space-y-6 py-6 border-y-8 border-dotted my-6 ${scoreResult.isPositive ? 'border-pink-50' : 'border-pink-200'}`}>
               {scoreResult.students.length === 1 ? (
                 <>
-                  <p className="text-3xl font-black text-slate-800">#{scoreResult.students[0].id} {scoreResult.students[0].name}</p>
-                  <div className={`mx-auto w-40 h-40 rounded-full flex items-center justify-center p-4 shadow-inner ${scoreResult.isPositive ? 'bg-pink-50' : 'bg-pink-50/50'}`}>
+                  <p className="text-4xl font-black text-slate-800 tracking-tight">#{scoreResult.students[0].id} {scoreResult.students[0].name}</p>
+                  <div className={`mx-auto w-56 h-56 rounded-full flex items-center justify-center p-6 shadow-inner ${scoreResult.isPositive ? 'bg-pink-50' : 'bg-pink-100/50'}`}>
                     <img 
                       src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${scoreResult.students[0].pokemonId}.png`} 
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain drop-shadow-lg"
                     />
                   </div>
-                  <p className={`text-4xl font-black ${scoreResult.isPositive ? 'text-pink-600' : 'text-pink-500'}`}>
-                    {scoreResult.points > 0 ? '+' : ''}{scoreResult.points} {scoreResult.reason}
-                  </p>
-                  <div className="bg-yellow-50 text-amber-700 rounded-full px-6 py-2 inline-flex items-center gap-2 font-black shadow-md mt-2">
-                    <span className="text-lg">⭐ 最新總分:</span>
-                    <span className="text-3xl">{scoreResult.students[0].newTotal}</span>
+                  <div className="flex flex-col items-center gap-2">
+                    <p className={`text-6xl font-black ${scoreResult.isPositive ? 'text-pink-600' : 'text-pink-500'}`}>
+                      {scoreResult.points > 0 ? '+' : ''}{scoreResult.points}
+                    </p>
+                    <p className="text-2xl font-black text-gray-400 uppercase tracking-widest">{scoreResult.reason}</p>
+                  </div>
+                  <div className="bg-yellow-400 text-white rounded-[2rem] px-8 py-3 inline-flex items-center gap-3 font-black shadow-lg mt-4 transform -rotate-1 hover:rotate-0 transition-transform">
+                    <span className="text-2xl">⭐</span>
+                    <span className="text-4xl leading-none">{scoreResult.students[0].newTotal}</span>
                   </div>
                 </>
               ) : (
                 <>
-                  <p className="text-2xl font-bold text-gray-700">多選評分 ({scoreResult.students.length} 位學生)</p>
-                  <p className={`text-4xl font-black ${scoreResult.isPositive ? 'text-pink-600' : 'text-pink-500'}`}>
-                    {scoreResult.points > 0 ? '+' : ''}{scoreResult.points} {scoreResult.reason}
+                  <p className="text-3xl font-bold text-gray-700">批次更新成功!</p>
+                  <p className="text-xl font-bold text-gray-400">已為 {scoreResult.students.length} 位學生</p>
+                  <p className={`text-6xl font-black ${scoreResult.isPositive ? 'text-pink-600' : 'text-pink-500'}`}>
+                    {scoreResult.points > 0 ? '+' : ''}{scoreResult.points}
                   </p>
-                  <p className="text-xl font-bold text-pink-400 mt-4 italic uppercase tracking-wider">Scores updated!</p>
+                  <p className="text-2xl font-black text-gray-300 uppercase mt-2">{scoreResult.reason}</p>
                 </>
               )}
             </div>
@@ -625,42 +665,42 @@ const App: React.FC = () => {
       {/* Random Picker Overlay */}
       {showRandomPicker && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md">
-          <div className="bg-white rounded-[3rem] p-10 shadow-2xl border-[12px] border-red-400 text-center max-w-lg w-full m-4">
-            <h2 className="text-3xl font-black text-red-500 mb-6 uppercase">🔍 Searching / 抽取中... ({pickedHistory.length}/{currentClass.students.length})</h2>
-            <div className="h-72 flex items-center justify-center bg-red-50 rounded-[2rem] mb-6 relative overflow-hidden border-4 border-red-100">
+          <div className="bg-white rounded-[4rem] p-12 shadow-[0_50px_100px_-20px_rgba(239,68,68,0.5)] border-[16px] border-red-400 text-center max-w-xl w-full m-4">
+            <h2 className="text-4xl font-black text-red-500 mb-8 uppercase tracking-tight">🔍 Searching... ({pickedHistory.length}/{currentClass.students.length})</h2>
+            <div className="h-80 flex items-center justify-center bg-red-50 rounded-[3rem] mb-8 relative overflow-hidden border-8 border-red-100/50">
               {flashingStudent && !randomPickResult && (
                 <div className="animate-pulse">
-                  <div className="mx-auto w-40 h-40">
-                    <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${flashingStudent.pokemonId}.png`} className="w-full h-full object-contain" />
+                  <div className="mx-auto w-48 h-48">
+                    <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${flashingStudent.pokemonId}.png`} className="w-full h-full object-contain pixelated" />
                   </div>
-                  <p className="text-4xl font-black text-red-600 mt-4">#{flashingStudent.id} {flashingStudent.name}</p>
+                  <p className="text-5xl font-black text-red-600 mt-6 tracking-tighter">#{flashingStudent.id} {flashingStudent.name}</p>
                 </div>
               )}
               {randomPickResult && (
                 <div className="scale-110 animate-in zoom-in duration-300">
-                  <div className="mx-auto w-48 h-48">
-                    <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomPickResult.pokemonId}.png`} className="w-full h-full object-contain" />
+                  <div className="mx-auto w-56 h-56">
+                    <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomPickResult.pokemonId}.png`} className="w-full h-full object-contain pixelated drop-shadow-2xl" />
                   </div>
-                  <p className="text-6xl font-black text-pink-600 mt-4">#{randomPickResult.id} {randomPickResult.name}</p>
-                  <p className="text-xl font-bold text-pink-400 mt-2 uppercase tracking-widest">I CHOOSE YOU! / 就決定是你了！</p>
+                  <p className="text-7xl font-black text-pink-600 mt-6 tracking-tighter drop-shadow-sm">#{randomPickResult.id} {randomPickResult.name}</p>
+                  <p className="text-2xl font-bold text-pink-400 mt-2 uppercase tracking-[0.2em] opacity-80">I CHOOSE YOU!</p>
                 </div>
               )}
             </div>
             {randomPickResult && (
-              <div className="flex gap-4">
+              <div className="flex gap-6">
                 <button 
                   onClick={() => {
                     setSelectedStudents([randomPickResult.id]);
                     setShowRandomPicker(false);
                     setShowScoreModal(true);
                   }}
-                  className="flex-1 py-5 bg-pink-500 text-white rounded-[1.5rem] font-black text-2xl hover:bg-pink-600 shadow-lg active:scale-95 transition"
+                  className="flex-1 py-6 bg-pink-500 text-white rounded-[2rem] font-black text-3xl hover:bg-pink-600 shadow-xl active:scale-95 transition-all hover:translate-y-[-4px]"
                 >
                   評分
                 </button>
                 <button 
                   onClick={() => setShowRandomPicker(false)}
-                  className="px-10 py-5 bg-slate-100 text-slate-500 rounded-[1.5rem] font-black text-2xl hover:bg-slate-200 transition"
+                  className="px-12 py-6 bg-slate-100 text-slate-500 rounded-[2rem] font-black text-3xl hover:bg-slate-200 transition-all active:scale-95"
                 >
                   CLOSE
                 </button>
@@ -673,33 +713,30 @@ const App: React.FC = () => {
       {/* Rules Modal */}
       {showRules && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl border-8 border-yellow-300">
-            <h2 className="text-3xl font-black text-yellow-600 mb-8 flex flex-col items-center gap-2 text-center">
-              <span className="text-5xl">🔔</span>
-              默書/測驗/考試 加分細則 <br/> <span className="text-sm font-bold opacity-50 uppercase tracking-widest">Rules for Tests & Exams</span>
+          <div className="bg-white rounded-[3rem] w-full max-w-md p-12 shadow-2xl border-[12px] border-yellow-300">
+            <h2 className="text-3xl font-black text-yellow-600 mb-10 flex flex-col items-center gap-4 text-center">
+              <span className="text-6xl animate-bounce">🔔</span>
+              默書/測驗/考試 加分細則 <br/> <span className="text-xs font-bold opacity-40 uppercase tracking-[0.3em]">Scoring Rules</span>
             </h2>
             <div className="space-y-4">
-              <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-2xl font-black text-xl border-b-4 border-yellow-100">
-                <span className="text-slate-700">100 或以上</span><span className="text-green-500">+25</span>
-              </div>
-              <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-2xl font-black text-xl border-b-4 border-yellow-100">
-                <span className="text-slate-700">90 ～ 99</span><span className="text-green-500">+20</span>
-              </div>
-              <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-2xl font-black text-xl border-b-4 border-yellow-100">
-                <span className="text-slate-700">80 ～ 89</span><span className="text-green-500">+15</span>
-              </div>
-              <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-2xl font-black text-xl border-b-4 border-yellow-100">
-                <span className="text-slate-700">70 ～ 79</span><span className="text-green-500">+10</span>
-              </div>
-              <div className="flex justify-between items-center p-4 bg-yellow-50 rounded-2xl font-black text-xl border-b-4 border-yellow-100">
-                <span className="text-slate-700">60 ～ 69</span><span className="text-green-500">+5</span>
-              </div>
+              {[
+                { range: '100 或以上', pts: '+25' },
+                { range: '90 ～ 99', pts: '+20' },
+                { range: '80 ～ 89', pts: '+15' },
+                { range: '70 ～ 79', pts: '+10' },
+                { range: '60 ～ 69', pts: '+5' }
+              ].map((rule, rIdx) => (
+                <div key={rIdx} className="flex justify-between items-center p-5 bg-yellow-50/50 rounded-2xl font-black text-2xl border-b-4 border-yellow-100/50 transition-colors hover:bg-yellow-50">
+                  <span className="text-slate-600 text-xl">{rule.range}</span>
+                  <span className="text-green-500 drop-shadow-sm">{rule.pts}</span>
+                </div>
+              ))}
             </div>
             <button 
               onClick={() => setShowRules(false)}
-              className="w-full mt-10 py-5 bg-yellow-400 text-white rounded-[1.5rem] font-black text-2xl hover:bg-yellow-500 transition shadow-lg active:scale-95"
+              className="w-full mt-12 py-6 bg-yellow-400 text-white rounded-[2rem] font-black text-3xl hover:bg-yellow-500 transition-all shadow-xl active:scale-95 hover:translate-y-[-4px]"
             >
-              GOT IT! / 知道了
+              GOT IT!
             </button>
           </div>
         </div>

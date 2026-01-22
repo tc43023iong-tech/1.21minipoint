@@ -45,23 +45,28 @@ const STUDENTS_4C = [
   "余樂恆", "鍾倬民", "鍾倬承"
 ];
 
+// Note: #16 林曉棟 has left the class. We use null to preserve the original IDs for others.
 const STUDENTS_3B = [
   "陳芷柔", "陳沛詩", "鄭穎彤", "張晉熙", "朱善恆", "馮子陽", "傅玥寧", "高宇皓", "何梓瑤", "何金霏",
-  "何冠奇", "黃欣彤", "黎芷楹", "黎子滔", "林子洋", "雷翊權", "李祤軒", "梁子泓", "梁皓宸", "梁依晴",
-  "廖巧澄", "駱峻霆", "伍嘉豪", "蕭家軒", "譚灝楊", "丁子皓", "黃芊諭", "王美樂", "許君豪", "周海嵐", "朱麗媛"
+  "何冠奇", "黃欣彤", "黎芷楹", "黎子滔", "林子洋", null, "雷翊權", "李祤軒", "梁子泓", "梁皓宸", 
+  "梁依晴", "廖巧澄", "駱峻霆", "伍嘉豪", "蕭家軒", "譚灝楊", "丁子皓", "黃芊諭", "王美樂", "許君豪", 
+  "周海嵐", "朱麗媛"
 ];
 
-const createClass = (id: string, name: string, studentNames: string[]) => ({
+const createClass = (id: string, name: string, studentNames: (string | null)[]) => ({
   id,
   name,
-  students: studentNames.map((name, index) => ({
-    id: index + 1,
-    name,
-    points: 0,
-    pokemonId: Math.floor(Math.random() * POKEMON_COUNT) + 1,
-    plusPoints: 0,
-    minusPoints: 0
-  }))
+  students: studentNames.map((name, index) => {
+    if (name === null) return null;
+    return {
+      id: index + 1,
+      name,
+      points: 0,
+      pokemonId: Math.floor(Math.random() * POKEMON_COUNT) + 1,
+      plusPoints: 0,
+      minusPoints: 0
+    };
+  }).filter(s => s !== null) as any[]
 });
 
 export const INITIAL_CLASSES = [
@@ -74,11 +79,19 @@ export const INITIAL_CLASSES = [
   createClass('5B_PTH', '五乙 普通話 (5B Mandarin)', STUDENTS_5B),
 ];
 
-// Helper to get Pokemon names (limited list for performance/space, will fallback to ID)
+// Helper to get Pokemon names
 export const POKEMON_NAMES: Record<number, { zh: string, en: string }> = {
   1: { zh: '妙蛙種子', en: 'Bulbasaur' },
+  2: { zh: '妙蛙草', en: 'Ivysaur' },
+  3: { zh: '妙蛙花', en: 'Venusaur' },
   4: { zh: '小火龍', en: 'Charmander' },
+  5: { zh: '火恐龍', en: 'Charmeleon' },
+  6: { zh: '噴火龍', en: 'Charizard' },
   7: { zh: '傑尼龜', en: 'Squirtle' },
+  8: { zh: '卡咪龜', en: 'Wartortle' },
+  9: { zh: '水箭龜', en: 'Blastoise' },
+  10: { zh: '綠毛蟲', en: 'Caterpie' },
+  11: { zh: '鐵甲蛹', en: 'Metapod' },
+  12: { zh: '巴大蝶', en: 'Butterfree' },
   25: { zh: '皮卡丘', en: 'Pikachu' },
-  // ... Simplified for the mock
 };
